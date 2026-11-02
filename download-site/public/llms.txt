@@ -2,7 +2,7 @@
 
 > STRATUM is a free music production app (a digital audio workstation, or DAW) for Mac, Windows, iPhone, iPad and Android, made by Matova LC. It is free during the alpha.
 
-- Current version: Alpha v11.2 (0.1.0-alpha.11.2), released November 1, 2026
+- Current version: Alpha v11.3 (0.1.0-alpha.11.3), released November 1, 2026
 - Mac: macOS 12 or later, Apple silicon and Intel
 - Windows: Windows 10 or 11, 64-bit
 - Phones and tablets: runs as a web app you add to your home screen
