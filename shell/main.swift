@@ -874,15 +874,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNaviga
     /// Looks for sample files a project points at: where it says they are, then beside the project file, then (for an Ableton
     /// set) anywhere in its project folder, by name. Found files are handed to the web side one at a time.
     private func findFiles(_ paths: [String], near: String) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let queue = Self.locate(paths, near: near)
+            DispatchQueue.main.async { self.sendFound(queue) }
+        }
+    }
+
+    /// Looks for sample files a project points at: where it says they are, then beside the project file, then (for an Ableton
+    /// set) anywhere in its project folder. Anything still missing is searched for by name in the places producers keep
+    /// sounds (the project's parent folder, Desktop, Documents, Downloads, Music, Splice and external drives), so a session's
+    /// sounds come in on their own even after a kit has been moved.
+    private static func locate(_ paths: [String], near: String) -> [(String, URL)] {
         let fm = FileManager.default, home = NSHomeDirectory()
         let dir = near.isEmpty ? nil : URL(fileURLWithPath: near).deletingLastPathComponent()
         let stem = near.isEmpty ? "" : URL(fileURLWithPath: near).deletingPathExtension().lastPathComponent
-        var queue: [(String, URL)] = []
+        let isFile = { (p: String) -> Bool in var d: ObjCBool = false; return fm.fileExists(atPath: p, isDirectory: &d) && !d.boolValue }
+        var queue: [(String, URL)] = [], missing: [String] = []
         // Ableton keeps sounds in folders under the set (Samples/Imported, Samples/Collected, Samples/Processed/Reverse...).
         var index: [String: [String]] = [:]
-        if let d = dir, near.lowercased().hasSuffix(".als"), let walk = fm.enumerator(at: d, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) {
-            var seen = 0
-            for case let u as URL in walk { seen += 1; if seen > 20000 { break }; index[u.lastPathComponent.lowercased(), default: []].append(u.path) }
+        if let d = dir, near.lowercased().hasSuffix(".als") { indexFolder(d, into: &index, wanted: nil, limit: 20000) }
+        // Two files can share a name, so one in the same folder as the project remembers comes first.
+        func pick(_ p: String, _ named: [String]) -> String? {
+            let parts = p.replacingOccurrences(of: "\\", with: "/").split(separator: "/").map(String.init)
+            let tail = "/" + parts.suffix(2).joined(separator: "/").lowercased()
+            return (named.filter { $0.lowercased().hasSuffix(tail) } + named).first(where: isFile)
         }
         for p in paths {
             let name = (p.replacingOccurrences(of: "\\", with: "/") as NSString).lastPathComponent
@@ -892,11 +907,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNaviga
             if let u = parts.firstIndex(where: { $0.lowercased() == "users" }), parts.count > u + 2 { tries.append(home + "/" + parts[(u + 2)...].joined(separator: "/")) }
             if let d = dir { tries += [d.appendingPathComponent(name).path, d.appendingPathComponent("Samples/" + name).path, d.appendingPathComponent(stem + "/Samples/" + name).path, d.appendingPathComponent(stem + "/" + name).path] }
             if !p.hasPrefix("/"), let d = dir { tries.append(d.appendingPathComponent(p).path) }
-            // Two files can share a name, so one in the same folder as the set remembers comes first.
-            let tail = "/" + parts.suffix(2).joined(separator: "/").lowercased(), named = index[name.lowercased()] ?? []
-            tries += named.filter { $0.lowercased().hasSuffix(tail) } + named
-            if let hit = tries.first(where: { var isDir: ObjCBool = false; return fm.fileExists(atPath: $0, isDirectory: &isDir) && !isDir.boolValue }) { queue.append((p, URL(fileURLWithPath: hit))) }
+            if let hit = tries.first(where: isFile) ?? pick(p, index[name.lowercased()] ?? []) { queue.append((p, URL(fileURLWithPath: hit))) } else { missing.append(p) }
         }
+        guard !missing.isEmpty else { return queue }
+        let want = Set(missing.map { ($0.replacingOccurrences(of: "\\", with: "/") as NSString).lastPathComponent.lowercased() })
+        var roots: [URL] = []
+        if let d = dir { roots += [d, d.deletingLastPathComponent()] }
+        for f in ["Desktop", "Documents", "Downloads", "Music", "Splice", "Documents/Image-Line"] { roots.append(URL(fileURLWithPath: home + "/" + f)) }
+        let vols = (try? fm.contentsOfDirectory(at: URL(fileURLWithPath: "/Volumes"), includingPropertiesForKeys: [.isSymbolicLinkKey], options: [.skipsHiddenFiles])) ?? []
+        roots += vols.filter { (try? $0.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) != true }   // the startup disk appears here as a link
+        var wide: [String: [String]] = [:], budget = 400_000
+        let started = Date()
+        for r in roots where budget > 0 && Date().timeIntervalSince(started) < 25 { budget = indexFolder(r, into: &wide, wanted: want, limit: budget, started: started) }
+        for p in missing {
+            let name = (p.replacingOccurrences(of: "\\", with: "/") as NSString).lastPathComponent
+            if let hit = pick(p, wide[name.lowercased()] ?? []) { queue.append((p, URL(fileURLWithPath: hit))) }
+        }
+        return queue
+    }
+
+    /// Lists the files under a folder by lowercased name (only the `wanted` names when given), skipping hidden files, app
+    /// bundles and Library folders. Returns how many more entries may be looked at.
+    @discardableResult
+    private static func indexFolder(_ root: URL, into index: inout [String: [String]], wanted: Set<String>?, limit: Int, started: Date = Date()) -> Int {
+        var left = limit
+        guard let walk = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsPackageDescendants]) else { return left }
+        for case let u as URL in walk {
+            left -= 1
+            if left <= 0 || (left % 2000 == 0 && Date().timeIntervalSince(started) > 25) { break }
+            let n = u.lastPathComponent, low = n.lowercased()
+            if n == "Library" || n == "Applications" || n == "node_modules" || low.hasSuffix(".app") { walk.skipDescendants(); continue }
+            if wanted == nil || wanted!.contains(low) { if !index[low, default: []].contains(u.path) { index[low, default: []].append(u.path) } }
+        }
+        return left
+    }
+
+    private func sendFound(_ found: [(String, URL)]) {
+        var queue = found
         func next() {
             guard !queue.isEmpty else { web.evaluateJavaScript("S.io.foundDone()", completionHandler: nil); return }
             let (wanted, url) = queue.removeFirst()

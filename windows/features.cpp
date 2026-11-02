@@ -10,6 +10,7 @@
 #include <shellapi.h>
 #include <tlhelp32.h>
 #include <wrl/implements.h>
+#include <set>
 #include <wrl/ftm.h>
 #include <shobjidl_core.h>
 #include <winrt/base.h>
@@ -447,8 +448,29 @@ static void indexFolder(const std::wstring &dir, std::map<std::wstring, std::vec
     FindClose(h);
     for (auto &d : subs) if (seen <= 20000) indexFolder(d, index, seen);
 }
-// Looks for the sound files a project refers to: where the project says they are, beside the project file, and (for an Ableton
-// set) anywhere in its project folder, by name.
+// Only the wanted names, from the places producers keep sounds. Skips hidden and system folders, AppData and program folders.
+static void indexWanted(const std::wstring &dir, std::map<std::wstring, std::vector<std::wstring>> &index, const std::set<std::wstring> &wanted, size_t &budget, ULONGLONG until) {
+    WIN32_FIND_DATAW fd;
+    HANDLE h = FindFirstFileW((dir + L"\\*").c_str(), &fd);
+    if (h == INVALID_HANDLE_VALUE) return;
+    std::vector<std::wstring> subs;
+    do {
+        std::wstring n = fd.cFileName;
+        if (n == L"." || n == L".." || (fd.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_REPARSE_POINT))) continue;
+        if (budget == 0 || GetTickCount64() > until) break;
+        budget--;
+        std::wstring low = n; for (auto &c : low) c = towlower(c);
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            if (low != L"appdata" && low != L"windows" && low.rfind(L"program files", 0) != 0 && low != L"programdata" && low != L"node_modules") subs.push_back(dir + L"\\" + n);
+            continue;
+        }
+        if (wanted.count(low)) index[low].push_back(dir + L"\\" + n);
+    } while (FindNextFileW(h, &fd));
+    FindClose(h);
+    for (auto &d : subs) if (budget > 0 && GetTickCount64() <= until) indexWanted(d, index, wanted, budget, until);
+}
+// Looks for the sound files a project refers to: where the project says they are, beside the project file, (for an Ableton
+// set) anywhere in its project folder, and then by name in the places producers keep sounds, so they come in on their own.
 void findFiles(const Json &paths, const std::string &nearUtf8) {
     foundQueue.clear();
     std::wstring nearP = wide(nearUtf8), dir, stem;
@@ -457,6 +479,8 @@ void findFiles(const Json &paths, const std::string &nearUtf8) {
     std::map<std::wstring, std::vector<std::wstring>> index;
     std::wstring nearLow = nearP; for (auto &c : nearLow) c = towlower(c);
     if (!dir.empty() && nearLow.size() > 4 && nearLow.compare(nearLow.size() - 4, 4, L".als") == 0) { size_t seen = 0; indexFolder(dir, index, seen); }
+    struct Missing { std::wstring low, tail, name; };
+    std::vector<Missing> missing;
     for (auto &pj : paths.a) {
         std::wstring p = wide(pj.str()), name = p;
         for (auto &c : name) if (c == L'/') c = L'\\';
@@ -481,12 +505,34 @@ void findFiles(const Json &paths, const std::string &nearUtf8) {
             for (auto &h : named->second) { std::wstring l = h; for (auto &c : l) c = towlower(c); if (l.size() >= tail.size() && l.compare(l.size() - tail.size(), tail.size(), tail) == 0) tries.push_back(h); }
             for (auto &h : named->second) tries.push_back(h);
         }
+        bool got = false;
         for (auto &t : tries) {
             DWORD a = GetFileAttributesW(t.c_str());
             if (a == INVALID_FILE_ATTRIBUTES || (a & FILE_ATTRIBUTE_DIRECTORY)) continue;
             std::vector<unsigned char> d;
-            if (readAll(t, d)) foundQueue.push_back({utf8(name), b64encode(d.data(), d.size()), utf8(t)});
+            if (readAll(t, d)) { foundQueue.push_back({utf8(name), b64encode(d.data(), d.size()), utf8(t)}); got = true; }
             break;
+        }
+        if (!got) missing.push_back({lowName, tail, name});
+    }
+    // Still missing: search by name in the project's parent folder, the user's sound folders and the other drives.
+    if (!missing.empty()) {
+        std::set<std::wstring> wanted; for (auto &m : missing) wanted.insert(m.low);
+        std::vector<std::wstring> roots;
+        if (!dir.empty()) { roots.push_back(dir); size_t k = dir.find_last_of(L"\\/"); if (k != std::wstring::npos && k > 2) roots.push_back(dir.substr(0, k)); }
+        for (const wchar_t *f : {L"\\Desktop", L"\\Documents", L"\\Downloads", L"\\Music", L"\\Splice", L"\\OneDrive\\Desktop", L"\\OneDrive\\Documents"}) roots.push_back(std::wstring(prof) + f);
+        DWORD drives = GetLogicalDrives();
+        for (int i = 3; i < 26; i++) if (drives & (1u << i)) { std::wstring r(1, wchar_t(L'A' + i)); r += L":"; if (r != std::wstring(prof).substr(0, 2)) roots.push_back(r); }
+        std::map<std::wstring, std::vector<std::wstring>> byName;
+        size_t budget = 400000; ULONGLONG until = GetTickCount64() + 15000;
+        for (auto &r : roots) indexWanted(r, byName, wanted, budget, until);
+        for (auto &m : missing) {
+            auto named = byName.find(m.low);
+            if (named == byName.end()) continue;
+            std::vector<std::wstring> order;
+            for (auto &h : named->second) { std::wstring l = h; for (auto &c : l) c = towlower(c); if (l.size() >= m.tail.size() && l.compare(l.size() - m.tail.size(), m.tail.size(), m.tail) == 0) order.push_back(h); }
+            for (auto &h : named->second) order.push_back(h);
+            for (auto &t : order) { std::vector<unsigned char> d; if (readAll(t, d)) { foundQueue.push_back({utf8(m.name), b64encode(d.data(), d.size()), utf8(t)}); break; } }
         }
     }
     foundNext();

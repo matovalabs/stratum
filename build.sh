@@ -63,6 +63,11 @@ cat > "$APP/Contents/Info.plist" <<EOF
   <key>NSPhotoLibraryAddUsageDescription</key><string>STRATUM saves your shared track videos to Photos so you can post them from your phone, for example as an Instagram Story.</string>
   <key>NSCameraUsageDescription</key><string>STRATUM shows your camera in a small box on your live stream when you turn the camera on.</string>
   <key>NSMicrophoneUsageDescription</key><string>STRATUM records audio from your microphone or audio interface onto the tracks you arm.</string>
+  <key>NSDesktopFolderUsageDescription</key><string>STRATUM looks for the sounds a project you open uses, so they come in with it.</string>
+  <key>NSDocumentsFolderUsageDescription</key><string>STRATUM looks for the sounds a project you open uses, so they come in with it.</string>
+  <key>NSDownloadsFolderUsageDescription</key><string>STRATUM looks for the sounds a project you open uses, so they come in with it.</string>
+  <key>NSRemovableVolumesUsageDescription</key><string>STRATUM looks for the sounds a project you open uses on your external drives, so they come in with it.</string>
+  <key>NSNetworkVolumesUsageDescription</key><string>STRATUM looks for the sounds a project you open uses on your network drives, so they come in with it.</string>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSPrincipalClass</key><string>NSApplication</string>
 </dict>
