@@ -608,10 +608,11 @@
         default: return null;
       }
     };
-    const NOT_SOUND = /^(AudioEffectGroupDevice|InstrumentGroupDevice|MidiEffectGroupDevice|DrumGroupDevice|OriginalSimpler|MultiSampler)$/;
+    const NOT_SOUND = /^(AudioEffectGroupDevice|InstrumentGroupDevice|MidiEffectGroupDevice|DrumGroupDevice|OriginalSimpler|MultiSampler|InstrumentImpulse)$/;
+    const IMPULSE_KEYS = [60, 62, 64, 65, 67, 69, 71, 72];   // Impulse's eight slots play on the white keys C3 to C4
     const plugName = (d) => val(d, ':scope > PluginDesc > VstPluginInfo > PlugName') || val(d, ':scope > PluginDesc > Vst3PluginInfo > Name') || val(d, ':scope > PluginDesc > AuPluginInfo > Name');
     const tracks = [], sceneBars = {}, left = new Set();
-    const rep = { notes: 0, audio: 0, sessionAudio: 0, sounds: 0, pads: 0, sliced: 0, approx: 0, fx: 0, fxOver: 0, folded: 0, pitched: 0, muted: 0, plugins: 0 };
+    const rep = { notes: 0, audio: 0, sessionAudio: 0, sounds: 0, pads: 0, sliced: 0, approx: 0, fx: 0, fxOver: 0, folded: 0, pitched: 0, muted: 0, plugins: 0, impulse: 0, zoned: 0 };
     let arrEnd = 0, audioTracks = 0, midiClips = 0;
     // Return tracks: STRATUM has no sends, so each return's effects go on the tracks that send to it, mixed by the send level.
     const returns = [...doc.querySelectorAll('Tracks > ReturnTrack')].map((t) => ({
@@ -628,6 +629,7 @@
       if (ft.mute) rep.muted++;
       // The sound: a Drum Rack pad by pad, a Simpler, or an instrument plugin at the head of the chain.
       const chain = chainOf(t), dg = chain.find((d) => d.tagName === 'DrumGroupDevice'), sim = chain.find((d) => d.tagName === 'OriginalSimpler' || d.tagName === 'MultiSampler');
+      const imp = chain.find((d) => d.tagName === 'InstrumentImpulse'), zones = sim && sim.tagName === 'MultiSampler' ? [...sim.querySelectorAll('MultiSamplePart')] : [];
       if (dg) {
         for (const b of dg.querySelectorAll(':scope > Branches > DrumBranch')) {
           const s = b.querySelector('OriginalSimpler, MultiSampler'), o = s && on(s) ? simpler(s) : null;
@@ -636,6 +638,21 @@
           ft.wanted.push({ kind: 'inst', file: o.file, path: o.path, pitch, tune: send - (o.root + o.key) + o.key + o.fine / 100, gain: o.gain * num(b, ':scope > MixerDevice > Volume > Manual', 1), start: o.start, end: o.end });
           rep.pads++;
         }
+      } else if (imp && on(imp)) {
+        // Impulse: each slot's sound goes on the pad for the key that plays it. A slot's own tuning and level are not read.
+        [...imp.querySelectorAll('SampleRef')].forEach((ref, i) => {
+          let h = ref.parentElement;
+          while (h && h !== imp && !h.hasAttribute('Id')) h = h.parentElement;
+          const slot = h && h !== imp ? parseInt(h.getAttribute('Id'), 10) : i, f = fileOf(ref), pitch = IMPULSE_KEYS[slot >= 0 && slot < 8 ? slot : i];
+          if (f && pitch && !ref.closest('SourceContext')) { ft.wanted.push({ kind: 'inst', file: f.file, path: f.path, pitch }); rep.pads++; }
+        });
+        ft.type = 'drums'; rep.impulse++;
+      } else if (zones.length > 1 && on(sim)) {
+        // A Sampler with several zones: each note the track plays gets the zone that covers it (at velocity 100), as a pad
+        // tuned from that zone's root key. Envelopes, filters and the rest of the Sampler are not read.
+        ft.zones = zones.map((z) => ({ f: fileOf(z.querySelector(':scope > SampleRef')), lo: num(z, ':scope > KeyRange > Min', 0), hi: num(z, ':scope > KeyRange > Max', 127),
+          vlo: num(z, ':scope > VelocityRange > Min', 1), vhi: num(z, ':scope > VelocityRange > Max', 127), root: num(z, ':scope > RootKey', 60) })).filter((z) => z.f);
+        ft.type = 'drums'; rep.zoned++;
       } else if (sim) {
         const o = simpler(sim);
         if (o) {
@@ -693,6 +710,13 @@
         ft.clips['s' + i] = { bars: Math.ceil(len / 4), notes };
         sceneBars[i] = Math.max(sceneBars[i] || 1, Math.ceil(len / 4)); midiClips++;
       });
+      if (ft.zones) {
+        for (const p of new Set([...ft.arr, ...Object.values(ft.clips).flatMap((c) => c.notes)].map((n) => n.p))) {
+          const hit = ft.zones.filter((z) => p >= z.lo && p <= z.hi), z = hit.find((x) => x.vlo <= 100 && x.vhi >= 100) || hit[0];
+          if (z) { ft.wanted.push({ kind: 'inst', file: z.f.file, path: z.f.path, pitch: p, tune: p - z.root }); rep.sounds++; }
+        }
+        delete ft.zones;
+      }
       tracks.push(ft);
     });
     const scenes = [], arrangement = [];
@@ -721,6 +745,8 @@
         ` Read from the set: ${list([say(rep.pads, 'drum pad'), say(rep.sounds, 'Simpler sound'), say(rep.audio, 'audio clip'), say(rep.fx, 'effect'), say(rep.folded, 'return-track effect moved onto the track that sends to it', 'return-track effects moved onto the tracks that send to them')]) || 'no sounds'}.` +
         (rep.approx ? ` ${rep.approx} of the ${say(rep.sliced, 'sliced sample')} use${rep.approx === 1 ? 's' : ''} Beat slices, which Live works out when it opens a set, so the chop points are STRATUM's best estimate and may differ from Live's.` : '') +
         (rep.fxOver ? ` ${rep.fxOver} effects left out: a track holds ${D.MAX_FX}.` : '') +
+        (rep.impulse ? ` ${say(rep.impulse, 'Impulse kit')} read onto pads; each slot's own tuning and level are not.` : '') +
+        (rep.zoned ? ` ${say(rep.zoned, 'Sampler with several zones', 'Samplers with several zones')}: each note plays the zone that covers it, without the Sampler's envelopes or filter.` : '') +
         (left.size ? ` Left out, no STRATUM match yet: ${[...left].join(', ')}.` : '') +
         (rep.pitched ? ` ${say(rep.pitched, 'audio clip was', 'audio clips were')} pitched in Live and ${rep.pitched === 1 ? 'plays' : 'play'} at the file's own pitch.` : '') +
         (rep.sessionAudio ? ` ${say(rep.sessionAudio, 'Session view audio clip is', 'Session view audio clips are')} not read.` : ''),
@@ -754,6 +780,7 @@
       else {
         let len = 0, shift = 0, b;
         do { b = u8[o++]; len |= (b & 0x7f) << shift; shift += 7; } while (b & 0x80);
+        if ((id === 212 || id === 213) && !inMixer && chan >= 0) (ch(chan).state = ch(chan).state || []).push([o, len]);   // the plugin's saved state
         if (id === 192 && chan >= 0) ch(chan).name = text(o, len);
         else if (id === 196 && chan >= 0) ch(chan).sample = text(o, len);
         else if (id === 201) { if (inMixer) fxNames.push(text(o, len)); else if (chan >= 0) ch(chan).fl = text(o, len); }
@@ -809,7 +836,7 @@
     const off = songBars ? 1 : 0;
     if (songBars) scenes.unshift({ name: 'Song', bars: songBars });
     const tracks = Object.keys(chans).map(Number).sort((a, b) => a - b).map((ci) => {
-      const nm = chans[ci].name || chans[ci].plugin || 'Channel ' + (ci + 1), dp = chans[ci].fl === 'Fruit Kick' ? 36 : drumFor(nm), clips = {};
+      const fpc = /^FPC$/i.test(chans[ci].fl || ''), nm = chans[ci].name || chans[ci].plugin || 'Channel ' + (ci + 1), dp = chans[ci].fl === 'Fruit Kick' ? 36 : fpc ? 0 : drumFor(nm), clips = {};
       const conv = (n, shift) => ({ t: n.t + shift, d: n.d, p: dp || n.p, v: n.v });
       patIds.forEach((k, si) => {
         const notes = pats[k].notes.filter((n) => n.ch === ci).map((n) => conv(n, 0));
@@ -820,7 +847,7 @@
         for (const it of items) for (const n of pats[it.pat].notes) if (n.ch === ci && (!it.len || n.t < it.len)) song.push(conv(n, it.t));
         if (song.length) clips[0] = { bars: songBars, notes: song };
       }
-      return { name: nm, type: chans[ci].type === 4 ? 'audio' : dp ? 'drums' : 'synth', vol: chans[ci].vol, pan: chans[ci].pan, clips, ci, dp };
+      return { name: nm, type: chans[ci].type === 4 ? 'audio' : dp || fpc ? 'drums' : 'synth', vol: chans[ci].vol, pan: chans[ci].pan, clips, ci, dp };
     }).filter((t) => chans[t.ci].type !== 5);   // automation clips are not tracks; they are read into automation below
     if (!tracks.length) throw new Error('No instrument channels found in this FL Studio project');
     const noteCount = patIds.reduce((a, k) => a + pats[k].notes.length, 0);
@@ -835,6 +862,42 @@
       if (c.type === 4) proj.wanted.push({ t: t.id, kind: 'clip', path: c.sample, file, items: clipItems.filter((it) => it.ch === ft.ci).map((it) => ({ t: it.t, len: it.len })) });
       else if (!c.type) proj.wanted.push({ t: t.id, kind: 'inst', path: c.sample, file, pitch: ft.dp || 0 });
     });
+    // FPC, Slicex, DirectWave, Fruity Slicer and Granulizer keep their sounds inside the plugin's saved state, which is not
+    // documented: the sound file paths are read out of it as text (FL saves them as UTF-16, older versions as plain text).
+    const SAMPLERS = /^(FPC|Slicex|DirectWave|Fruity Slicer|Fruity granulizer)$/i, ROOT = /([A-Za-z]:[\\/]|%FLStudio[A-Za-z]*%|\/Users\/|\/Volumes\/)/;
+    const soundsIn = (state) => {
+      const hits = [];
+      for (const [a, len] of state || []) {
+        const b = u8.subarray(a, a + len), wide = (x) => new TextDecoder('utf-16le').decode(x.subarray(0, x.length & ~1));
+        // Text can start on an even or odd byte, so both alignments are read; matches are kept in the order they are stored.
+        for (const [s, scale, shift] of [[wide(b), 2, 0], [wide(b.subarray(1)), 2, 1], [new TextDecoder('latin1').decode(b), 1, 0]])
+          for (const m of s.matchAll(/[^\0-\x1f"*<>?|]{1,400}?\.(wav|wave|aiff?|mp3|flac|ogg|m4a)(?![a-z0-9])/gi)) {
+            const at = m[0].search(ROOT), path = (at >= 0 ? m[0].slice(at) : m[0]).trim();
+            hits.push({ pos: a + m.index * scale + shift, path, file: path.split(/[\\/]/).pop() });
+          }
+      }
+      const out = [];
+      for (const h of hits.sort((x, y) => x.pos - y.pos)) if (h.file.length > 4 && !out.some((x) => x.file.toLowerCase() === h.file.toLowerCase())) out.push({ path: h.path, file: h.file });
+      return out;
+    };
+    // FPC pads: a sound named like a drum goes to that drum's General MIDI note (kick 36, snare 38, hat 42…) when the
+    // patterns play it; the other sounds fill the remaining played notes from low to high, in pad order.
+    const gm = (p) => (p === 35 || p === 36 ? 36 : p === 38 || p === 40 ? 38 : p === 42 || p === 44 ? 42 : [41, 43, 45, 47, 48, 50].includes(p) ? 45 : [37, 39, 46].includes(p) ? p : 0);
+    let inside = 0;
+    const insideOf = [];
+    tracks.forEach((ft, i) => {
+      const c = chans[ft.ci], t = proj.tracks[i];
+      if (!t || c.sample || !SAMPLERS.test(c.fl || '')) return;
+      const found = soundsIn(c.state);
+      if (!found.length) return;
+      c.inside = true; inside += found.length; insideOf.push(c.fl);
+      if (t.type === 'drums') {
+        const used = [...new Set(patIds.flatMap((k) => pats[k].notes.filter((n) => n.ch === ft.ci).map((n) => n.p)))].sort((a, b) => a - b), left = found.slice(), pad = {};
+        for (const p of used) { const k = gm(p), j = k ? left.findIndex((f) => drumFor(f.file.replace(/\.[^.]+$/, '')) === k) : -1; if (j >= 0) pad[p] = left.splice(j, 1)[0]; }
+        for (const p of used) if (!pad[p] && left.length) pad[p] = left.shift();
+        for (const p of used) if (pad[p]) proj.wanted.push({ t: t.id, kind: 'inst', path: pad[p].path, file: pad[p].file, pitch: p });
+      } else proj.wanted.push({ t: t.id, kind: 'inst', path: found[0].path, file: found[0].file, pitch: 0 });
+    });
     const audioClips = clipItems.filter((it) => chans[it.ch] && chans[it.ch].type === 4).length;
     // FL Studio's own instruments cannot be recreated; a few get a stand-in built-in sound, hosted VSTs are looked up later.
     const STAND = { BooBass: { wave: 'sine', wave2: 'triangle', detune: 0, attack: 0.01, release: 0.15, cutoff: 0.35, res: 0.1 }, 'Plucked!': { wave: 'sawtooth', wave2: 'triangle', detune: 0.05, attack: 0, release: 0.35, cutoff: 0.7, res: 0.1 } };
@@ -843,7 +906,7 @@
     tracks.forEach((ft, i) => {
       const c = chans[ft.ci], t = proj.tracks[i];
       trackOf[ft.ci] = t;
-      if (!t || c.type !== 2 || !c.fl) return;
+      if (!t || c.type !== 2 || !c.fl || c.inside) return;
       if (c.vst) return proj.wantPlugins.push({ t: t.id, name: c.vst.name, maker: c.vst.maker || '' });
       if (STAND[c.fl] && t.inst) Object.assign(t.inst, STAND[c.fl]);
       standIns.push(c.fl);
@@ -877,6 +940,7 @@
         (proj.wanted.length ? `It uses ${proj.wanted.length} sample files` + (audioClips ? ` (${audioClips} audio clips on the playlist)` : '') + '. An .flp only points at those files, so STRATUM looks for them on this Mac; use “Missing samples” to choose any it cannot find. ' : '') +
         (noteCount ? '' : 'This project has no pattern notes (it is built from audio or automation clips), so the tracks came in empty. ') +
         (songBars ? `The playlist was read into a ${songBars}-bar “Song” scene.` : 'No playlist found, so each pattern is placed once in the arrangement.') + ' ' + (autoRead ? `${autoRead} automation lanes read (volume and pan). ` : '') + (autoSkipped ? `${autoSkipped} automation clips control things STRATUM cannot automate (tempo, pitch or plugin settings) and were left out. ` : '') +
+        (inside ? `${inside} sounds were read from inside ${[...new Set(insideOf)].join(', ')}. FPC pads are matched to the notes by drum name and pad order, which is STRATUM's best estimate; a Slicex or DirectWave track plays its first sound across the keys, without its slices or zones. ` : '') +
         (fake.length ? `FL Studio's own instruments cannot be recreated, so these play on a stand-in built-in sound: ${fake.join(', ')}. ` : '') +
         (fxUsed.length ? `Mixer effects not carried over: ${fxUsed.join(', ')}.` : ''),
     };
@@ -951,7 +1015,8 @@
           if (/^\/[A-Za-z]:/.test(path)) path = path.slice(1);
           if (file && /[\\/]$/.test(path)) path += file;
         }
-        const factory = ss.some((x) => /Factory Sound Bank|Orkester|\.rfl$/i.test(x)) || /Projects Content\/Reason Factory/i.test(path) || /\.(drum|sxt|rx2)$/i.test(file);
+        // REX loops (.rx2, .rex, .rcy, Dr. Octo Rex) are a format only Reason can play, so they are treated the same way.
+        const factory = ss.some((x) => /Factory Sound Bank|Orkester|\.rfl$/i.test(x)) || /Projects Content\/Reason Factory/i.test(path) || /\.(drum|sxt|rx2|rex|rcy)$/i.test(file);
         return { file, path: path || file, factory };
       }).filter((r) => r.file) : [];
     };
