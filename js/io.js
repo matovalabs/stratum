@@ -89,6 +89,19 @@
     proj.wanted = proj.wanted.filter((w) => !ws.includes(w));
     return true;
   };
+  // Sounds chosen or uploaded together with a project (several files, or a whole folder): the project opens first, then
+  // every other file is matched to the samples it is missing by name. Files it does not use are not added as tracks.
+  IO.SESSION = /\.(stratum|json|mid|midi|als|flp|zip|reason|logicx)$/i;
+  IO.importBatch = async (files) => {
+    const proj = files.filter((f) => IO.SESSION.test(f.name) && !/(^|\/)(Backup|__MACOSX)\//.test(f.path || ''));
+    if (proj.length !== 1 || files.length < 2) { for (const f of files) await IO.importBytes(f.name, await f.read(), f.path); return; }
+    await IO.importBytes(proj[0].name, await proj[0].read(), proj[0].path);
+    if (!(S.proj.wanted || []).length) return;
+    const need = new Set(S.proj.wanted.map((w) => w.file.toLowerCase()));
+    let n = 0;
+    for (const f of files) if (f !== proj[0] && need.has(f.name.toLowerCase()) && (await IO.offer(f.name, await f.read()).catch(() => false))) n++;
+    if (n) { if (await IO.fillPads(S.proj)) S.engine.rebuild(); S.ui.wantedDone(n); }
+  };
   // After an import, ask the Mac or Windows app to look for the missing files where the project says they are and beside the project file.
   IO.seek = () => new Promise(async (res) => {
     let n = 0;
@@ -1261,6 +1274,8 @@ ${lanes}    </Lanes>
       catch (e) { adding.failed = e.message || String(e); }
       return;
     }
+    // Finding missing samples: a file is only ever matched to them, never opened as a project or a new track.
+    if (S.ui.locating) { if (await IO.offer(fname, ab).catch(() => false)) S.ui.located++; return; }
     try {
       let res;
       if (ext === 'stratum' || ext === 'json') res = { proj: await IO.loadProject(new TextDecoder().decode(ab)), report: 'Project opened.' };
@@ -1311,7 +1326,6 @@ ${lanes}    </Lanes>
         S.ui.refresh();
         return;
       }
-      else if (S.ui.locating) { if (await IO.offer(fname, ab)) S.ui.located++; return; }
       else res = { audio: await IO.addAudio(fname, ab) };
       S.ui.imported(res);
       if (res.proj && res.proj.wanted && res.proj.wanted.length) await IO.seek();

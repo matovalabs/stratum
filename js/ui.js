@@ -842,7 +842,8 @@
     keys() { U.keys = !U.keys; syncHeader(); U.toast(U.keys ? 'Keys on: A–L row plays the selected track, Z / X change octave. Everything you play is captured for Dump Score Log.' : 'Keys off: letter keys are shortcuts again.'); },
     toggleMode() { $('#modeSel').value = $('#modeSel').value === 'scene' ? 'song' : 'scene'; C.mode($('#modeSel')); },
     new() { S.snap(); const p = S.blankProject(); S.newScene(p, 'Scene 1', 1); S.newTrack(p, 'drums', 'Drums'); S.newTrack(p, 'synth', 'Synth'); setProject(p); },
-    open() { U.pendingAudio = null; U.pendingSample = null; IO.open(); },
+    // In a browser the project and its sounds (or the whole folder's files) can be chosen together and are matched by name.
+    open() { U.pendingAudio = null; U.pendingSample = null; IO.open(!IO.host()); },
     // Sounds browser: built-in CC0 sounds by category, with search, preview, and a button that puts the sound where it fits
     // the selected track (a drum pad, the sampler, an audio clip, or for MIDI files the notes themselves).
     async sounds(el) {
@@ -1010,10 +1011,10 @@
     clearAuto() { structural(() => { delete curTrack().auto; delete P().master.auto; }); },
     wanted() {
       const w = P().wanted || [];
-      showPop(`<h3>Missing samples</h3><p class="hint">This project uses these sound files, but they are not on this ${DEV} where the project says they are. Choose them (you can pick several at once); files are matched by name.</p><div class="plist">` +
-        w.map((x) => `<div title="${esc(x.path)}">${esc(x.file)}</div>`).join('') + `</div><button data-act="wantedPick">Choose sample files…</button> <button data-act="closePop">Close</button>`);
+      showPop(`<h3>Missing samples</h3><p class="hint">This project uses these sound files, but they are not on this ${DEV} where the project says they are. Choose the folder you keep your sounds in and every one it finds inside is loaded, or pick the files; they are matched by name.</p><div class="plist">` +
+        w.map((x) => `<div title="${esc(x.path)}">${esc(x.file)}</div>`).join('') + `</div><button data-act="wantedPick" data-folder="1" class="primary">Choose your samples folder…</button> <button data-act="wantedPick">Choose sample files…</button> <button data-act="closePop">Close</button>`);
     },
-    wantedPick() { closePop(); U.pendingAudio = null; U.pendingSample = null; U.locating = true; U.located = 0; IO.open(true); },
+    wantedPick(el) { closePop(); U.pendingAudio = null; U.pendingSample = null; U.locating = true; U.located = 0; IO.open(true, !!(el && el.dataset.folder)); },
     save() { IO.saveProject(); },
     saveShare() { closePop(); IO.sharePending(); },
     saveDownload() { closePop(); IO.downloadPending(); },
@@ -1217,7 +1218,12 @@
 
   U.setProject = (p) => setProject(p);
   U.imported = (res) => {
-    if (res.proj) { S.snap(); setProject(res.proj); U.wantedUI(); U.report = res.report; return U.toast(res.report); }
+    if (res.proj) {
+      S.snap(); setProject(res.proj); U.wantedUI(); U.report = res.report;
+      // An imported song lives on the timeline, so the play button is set to Song. Nothing starts until play is pressed.
+      if (S.songEnd(res.proj) > 0) { E.mode = 'song'; $('#modeSel').value = 'song'; syncHeader(); }
+      return U.toast(res.report);
+    }
     if (U.pendingSample && tr(U.pendingSample.t) && tr(U.pendingSample.t).type !== 'audio') {
       const ps = U.pendingSample, t = tr(ps.t), nm = res.audio.name.replace(/\.[^.]+$/, '');
       S.snap();
@@ -1411,9 +1417,13 @@
     while (U.log.length && now - U.log[0].ms > 300000) U.log.shift();
   });
   $('#file').addEventListener('change', async (e) => {
-    const files = [...e.target.files];
+    let files = [...e.target.files];
     e.target.value = '';
-    for (const f of files) await IO.importBytes(f.name, await f.arrayBuffer(), f.webkitRelativePath || '');
+    // A whole samples folder can hold thousands of files: only the ones the project is missing are read.
+    if (U.locating) { const need = new Set((P().wanted || []).map((w) => w.file.toLowerCase())); files = files.filter((f) => need.has(f.name.toLowerCase())); }
+    if (U.locating || U.addingSounds || U.pendingSample || U.pendingAudio || U.pendingWave) {
+      for (const f of files) await IO.importBytes(f.name, await f.arrayBuffer(), f.webkitRelativePath || '');
+    } else await IO.importBatch(files.map((f) => ({ name: f.name, path: f.webkitRelativePath || '', read: () => f.arrayBuffer() })));
     U.openDone();
   });
   window.addEventListener('resize', drawCables);
