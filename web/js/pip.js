@@ -10,11 +10,12 @@
     ['beside', 'Side by side'],
     ['big', 'Camera big, beat in a box (drag it)'],
   ];
-  const DEFAULT = { mode: 'box', x: 0.82, y: 0.8, s: 0.28, mic: false };
+  // Shares start without the camera; Go live starts with it beside the window, as it always did.
+  const DEFAULT = { mode: 'none', x: 0.82, y: 0.8, s: 0.28, mic: false };
   const load = () => { try { return JSON.parse(localStorage.getItem('stratum.pip') || '{}'); } catch (e) { return {}; } };
   const save = (all) => { try { localStorage.setItem('stratum.pip', JSON.stringify(all)); } catch (e) {} };
   // `use` is 'live' or 'share'; each remembers its own layout.
-  P.get = (use) => ({ ...DEFAULT, ...(use === 'live' ? { s: 0.22 } : {}), ...(load()[use] || {}) });
+  P.get = (use) => ({ ...DEFAULT, ...(use === 'live' ? { mode: 'beside', s: 0.22 } : {}), ...(load()[use] || {}) });
   P.set = (use, v) => { const all = load(); all[use] = { ...P.get(use), ...v }; save(all); };
   P.camera = (lay) => lay.mode !== 'none';
 
