@@ -419,7 +419,9 @@
   };
 
   IO.addAudio = async (name, ab) => {
-    const ctx = E.ensure(), buf = await ctx.decodeAudioData(ab), id = S.uid(), bpm = D.detectBpm(buf);
+    // A tempo in the file name ("Trap Drum Loop 140 BPM") is trusted over detection, which can land on a half, double or wrong tempo.
+    const named = (name.match(/(?:^|[^0-9])([4-9][0-9]|1[0-9][0-9]|2[0-4][0-9])\s*bpm\b/i) || [])[1];
+    const ctx = E.ensure(), buf = await ctx.decodeAudioData(ab), id = S.uid(), bpm = named ? +named : D.detectBpm(buf);
     S.buffers[id] = { id, name, buf, bpm };
     return S.buffers[id];
   };

@@ -865,7 +865,8 @@
     async sounds(el) {
       const all = await IO.soundList(), cats = ['My Sounds', ...[...new Set(all.filter((x) => !x.mine).map((x) => x.category))].sort()], t = curTrack();
       U.libCat = (el && el.dataset && el.dataset.cat) || U.libCat || cats[1] || cats[0];
-      const q = (U.libQuery || '').toLowerCase(), list = all.filter((x) => (q ? (x.name + ' ' + x.category + ' ' + (x.kind || '') + ' ' + (x.tags || '')).toLowerCase().includes(q) : x.category === U.libCat)).slice(0, 300);
+      const q = (U.libQuery || '').toLowerCase(), list = all.filter((x) => (q ? (x.name + ' ' + x.category + ' ' + (x.kind || '') + ' ' + (x.tags || '')).toLowerCase().includes(q) : x.category === U.libCat))
+        .sort((a, b) => (q ? ((b.genres || '').includes(q) || b.name.toLowerCase().includes(q)) - ((a.genres || '').includes(q) || a.name.toLowerCase().includes(q)) : 0)).slice(0, 300); // sounds named or made for the search come first
       const mineView = !q && U.libCat === 'My Sounds', nMine = all.filter((x) => x.mine).length;
       const verb = (x) => (/\.mid$/i.test(x.path) ? (t.type === 'audio' ? '' : 'Add notes') : t.type === 'drums' ? 'Add to pad' : t.type === 'synth' ? 'Use as sample' : 'Add as clip');
       const pretty = (x) => x.name.replace(/^(VPFX|DVS|DVSV2|PP|HPR) - /, '');

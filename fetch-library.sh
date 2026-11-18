@@ -69,6 +69,8 @@ def audio(src, base):
     if not readable(wav): sys.exit("could not convert " + src)
     return wav
 entries = []
+gpath = os.path.join(work, "stratum-originals", "genres.json")
+genres = json.load(open(gpath)) if os.path.exists(gpath) else {}
 sources = [(os.path.join(work, "stargate", "stargate-sample-pack"), "Stargate (CC0)"), (os.path.join(work, "producer-space", "Producer Space", "Packs"), "Producer Space (CC0)"), (os.path.join(work, "stratum-originals"), "STRATUM Originals")]
 for root, coll in sources:
     for d, _, files in os.walk(root):
@@ -86,7 +88,9 @@ for root, coll in sources:
             else:
                 out_rel = audio(src, os.path.join(lib, out_rel))
                 out_rel = os.path.relpath(out_rel, lib)
-            entries.append({"path": out_rel, "name": name, "category": cat, "collection": coll})
+            e = {"path": out_rel, "name": name, "category": cat, "collection": coll}
+            if coll == "STRATUM Originals" and genres.get(cat + "/" + name): e["genres"] = genres[cat + "/" + name]
+            entries.append(e)
 for coll, lic in [("Stargate (CC0)", os.path.join(work, "stargate", "LICENSE")), ("Producer Space (CC0)", os.path.join(work, "producer-space", "Producer Space", "LICENSE.txt"))]:
     if os.path.exists(lic): shutil.copyfile(lic, os.path.join(lib, coll, "LICENSE.txt"))
 json.dump(entries, open(os.path.join(lib, "library.json"), "w"), indent=0)
