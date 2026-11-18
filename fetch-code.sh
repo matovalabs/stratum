@@ -17,9 +17,22 @@ if [ ! -d vendor/airwin2rack ]; then
   git -C vendor/airwin2rack checkout -q 8a67b80e04230a5cf40e84d6e8b9a2fd70b13a75
 fi
 # ONNX Runtime for Windows (MIT licence), for stem separation in the Windows app. Only fetched on Windows.
-if [ "${OS:-}" = "Windows_NT" ] && [ ! -d vendor/onnxruntime-win-x64-1.31.0 ]; then
-  curl -fsSL --retry 3 -o vendor/ort-win.zip https://github.com/microsoft/onnxruntime/releases/download/v1.31.0/onnxruntime-win-x64-1.31.0.zip
-  echo "3958d8a44984160692c1b4ffd0de3cb48f8c39f9d34bb31e433db06e30b82195  vendor/ort-win.zip" | sha256sum -c -
-  unzip -q vendor/ort-win.zip -d vendor && rm vendor/ort-win.zip
+# It comes from Microsoft's official NuGet package (the GitHub release download stopped working in November 2026), checked
+# against the SHA-512 NuGet publishes, and is laid out as the GitHub zip was: include/, lib/onnxruntime.dll, licences.
+ORT_WIN=vendor/onnxruntime-win-x64-1.31.0
+if [ "${OS:-}" = "Windows_NT" ] && [ ! -f "$ORT_WIN/lib/onnxruntime.dll" ]; then
+  curl -fsSL --retry 3 -o vendor/ort-win.nupkg https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.31.0/microsoft.ml.onnxruntime.1.31.0.nupkg
+  python - vendor/ort-win.nupkg <<'PY'
+import base64, hashlib, sys
+h = base64.b64encode(hashlib.sha512(open(sys.argv[1], 'rb').read()).digest()).decode()
+want = 'J7arTn+7nrWdZ+PF2Sl9aNW1/Ba5DCt1ywZ3r5l3LKqzj3w8oC7Cl/uagG3Xp1ivuYJYQAMSuew0ef/74f7XCw=='
+sys.exit(0 if h == want else 'ONNX Runtime package hash mismatch: ' + h)
+PY
+  rm -rf vendor/ort-pkg "$ORT_WIN" && mkdir -p vendor/ort-pkg "$ORT_WIN/include" "$ORT_WIN/lib"
+  unzip -q vendor/ort-win.nupkg 'build/native/include/*' 'runtimes/win-x64/native/*' LICENSE ThirdPartyNotices.txt -d vendor/ort-pkg
+  cp vendor/ort-pkg/build/native/include/* "$ORT_WIN/include/"
+  cp vendor/ort-pkg/runtimes/win-x64/native/* "$ORT_WIN/lib/"
+  cp vendor/ort-pkg/LICENSE vendor/ort-pkg/ThirdPartyNotices.txt "$ORT_WIN/"
+  rm -rf vendor/ort-pkg vendor/ort-win.nupkg
 fi
 echo "Vendor code ready."
