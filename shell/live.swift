@@ -34,6 +34,25 @@ final class LiveSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate,
     /// Off in self-checks, so they never ask for the Screen & System Audio Recording permission.
     static var systemSound = true
 
+    /// Where the window (or Visuals) and the camera go: rectangles as fractions of the frame, measured from the top left,
+    /// as the page's camera layout picker (pip.js) sends them. camTop: the camera is drawn over the window.
+    struct Layout { var main = CGRect(x: 0, y: 0, width: 1, height: 1), cam: CGRect? = nil, camTop = true }
+    private var layout = Layout()
+    /// The layout the page sent, or the original one (the camera beside the window) when it sent none.
+    static func layout(from body: [String: Any]) -> Layout {
+        func rect(_ v: Any?) -> CGRect? {
+            guard let a = v as? [Any], a.count == 4 else { return nil }
+            let n = a.map { ($0 as? NSNumber)?.doubleValue ?? 0 }
+            return CGRect(x: n[0], y: n[1], width: max(0.01, n[2]), height: max(0.01, n[3]))
+        }
+        guard let d = body["layout"] as? [String: Any], let main = rect(d["main"]) else {
+            let cw = 0.24, ch = cw * 1280 * 9 / 16 / 720, pad = 12.0 / 1280
+            return Layout(main: CGRect(x: pad, y: 0, width: 1 - cw - pad * 3, height: 1), cam: CGRect(x: 1 - cw - pad, y: 1 - ch - 0.03, width: cw, height: ch), camTop: true)
+        }
+        return Layout(main: main, cam: rect(d["cam"]), camTop: d["camTop"] as? Bool ?? true)
+    }
+    func setLayout(_ l: Layout) { lock.lock(); layout = l; lock.unlock() }
+
     init(web: WKWebView) { self.web = web }
 
     // MARK: start and stop
@@ -122,34 +141,50 @@ final class LiveSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate,
         var pb: CVPixelBuffer?
         CVPixelBufferPoolCreatePixelBuffer(nil, pool, &pb)
         guard let px = pb else { return }
-        lock.lock(); let win = windowImage, camImg = cameraImage; lock.unlock()
-        let W = CGFloat(Self.width), H = CGFloat(Self.height)
-        var canvas = CIImage(color: CIColor(red: 0x0f / 255, green: 0x10 / 255, blue: 0x16 / 255)).cropped(to: CGRect(x: 0, y: 0, width: W, height: H))
-        // With the camera on, the window shrinks a little to leave a column on the right, and the camera box sits at the
-        // bottom of that column, so it never covers any of the session.
-        let pad: CGFloat = 12, bw = camImg == nil ? 0 : (W * 0.17).rounded(), bh = (bw * 9 / 16).rounded()
-        let area = CGRect(x: pad, y: 0, width: W - (bw > 0 ? bw + pad * 3 : pad * 2), height: H)
-        if let win = win {
-            let w = CGFloat(win.width), h = CGFloat(win.height), s = min(area.width / w, area.height / h)
-            let x = bw > 0 ? area.minX : (W - w * s) / 2
-            let img = CIImage(cgImage: win).transformed(by: CGAffineTransform(scaleX: s, y: s)).transformed(by: CGAffineTransform(translationX: x, y: (H - h * s) / 2))
-            canvas = img.composited(over: canvas)
-        }
-        if let cam = camImg {
-            let x = W - bw - pad, y = pad + 3
-            let e = cam.extent, s = max(bw / e.width, bh / e.height)
-            let scaled = cam.transformed(by: CGAffineTransform(scaleX: s, y: s))
-            let fitted = scaled.transformed(by: CGAffineTransform(translationX: x - scaled.extent.minX - (scaled.extent.width - bw) / 2, y: y - scaled.extent.minY - (scaled.extent.height - bh) / 2))
-                .cropped(to: CGRect(x: x, y: y, width: bw, height: bh))
-            let frame = CIImage(color: CIColor(red: 0xe3 / 255, green: 0x9a / 255, blue: 0x12 / 255)).cropped(to: CGRect(x: x - 2, y: y - 2, width: bw + 4, height: bh + 4))
-            canvas = fitted.composited(over: frame.composited(over: canvas))
-        }
+        lock.lock(); let win = windowImage, camImg = cameraImage, lay = layout; lock.unlock()
+        let W = CGFloat(Self.width), H = CGFloat(Self.height), canvas = compose(win: win, camImg: camImg, lay: lay)
         ci.render(canvas, to: px, bounds: CGRect(x: 0, y: 0, width: W, height: H), colorSpace: CGColorSpaceCreateDeviceRGB())
         let pts = CMTime(value: frameNo, timescale: CMTimeScale(Self.fps)); frameNo += 1
         VTCompressionSessionEncodeFrame(v, imageBuffer: px, presentationTimeStamp: pts, duration: CMTime(value: 1, timescale: CMTimeScale(Self.fps)), frameProperties: nil, infoFlagsOut: nil) { [weak self] status, _, sb in
             guard status == noErr, let sb = sb, let self = self else { return }
             self.sendVideo(sb)
         }
+    }
+
+
+    /// One frame: the window (or Visuals) and the camera, placed by the layout.
+    func compose(win: CGImage?, camImg: CIImage?, lay: Layout) -> CIImage {
+        let W = CGFloat(Self.width), H = CGFloat(Self.height)
+        var canvas = CIImage(color: CIColor(red: 0x0f / 255, green: 0x10 / 255, blue: 0x16 / 255)).cropped(to: CGRect(x: 0, y: 0, width: W, height: H))
+        // The page's rectangles are measured from the top left; Core Image measures from the bottom left.
+        func toPx(_ r: CGRect) -> CGRect { CGRect(x: (r.minX * W).rounded(), y: (H - r.maxY * H).rounded(), width: (r.width * W).rounded(), height: (r.height * H).rounded()) }
+        let amber = CIColor(red: 0xe3 / 255, green: 0x9a / 255, blue: 0x12 / 255), ink = CIColor(red: 0x0f / 255, green: 0x10 / 255, blue: 0x16 / 255)
+        func border(_ r: CGRect) -> CIImage { CIImage(color: amber).cropped(to: r.insetBy(dx: -2, dy: -2)) }
+        // The window (or Visuals), fitted inside its rectangle.
+        func windowLayer(_ r: CGRect, boxed: Bool) -> CIImage? {
+            guard let win = win else { return nil }
+            let w = CGFloat(win.width), h = CGFloat(win.height), sc = min(r.width / w, r.height / h)
+            let img = CIImage(cgImage: win).transformed(by: CGAffineTransform(scaleX: sc, y: sc)).transformed(by: CGAffineTransform(translationX: r.minX + (r.width - w * sc) / 2, y: r.minY + (r.height - h * sc) / 2))
+            return boxed ? img.composited(over: CIImage(color: ink).cropped(to: r)).composited(over: border(r)) : img
+        }
+        // The camera, filling its rectangle (cropped to its shape).
+        func cameraLayer(_ r: CGRect, boxed: Bool) -> CIImage? {
+            guard let cam = camImg else { return nil }
+            let e = cam.extent, sc = max(r.width / e.width, r.height / e.height)
+            let scaled = cam.transformed(by: CGAffineTransform(scaleX: sc, y: sc))
+            let fitted = scaled.transformed(by: CGAffineTransform(translationX: r.minX - scaled.extent.minX - (scaled.extent.width - r.width) / 2, y: r.minY - scaled.extent.minY - (scaled.extent.height - r.height) / 2)).cropped(to: r)
+            return boxed ? fitted.composited(over: border(r)) : fitted
+        }
+        let mainR = toPx(lay.main), camR = lay.cam.map(toPx)
+        let fullMain = mainR.width >= W - 1 && mainR.height >= H - 1, fullCam = camR.map { $0.width >= W - 1 && $0.height >= H - 1 } ?? false
+        if lay.camTop || camImg == nil {
+            if let m = windowLayer(camImg == nil && camR != nil ? CGRect(x: 0, y: 0, width: W, height: H) : mainR, boxed: false) { canvas = m.composited(over: canvas) }
+            if let r = camR, let c = cameraLayer(r, boxed: !fullCam) { canvas = c.composited(over: canvas) }
+        } else {
+            if let r = camR, let c = cameraLayer(r, boxed: false) { canvas = c.composited(over: canvas) }
+            if let m = windowLayer(mainR, boxed: !fullMain) { canvas = m.composited(over: canvas) }
+        }
+        return canvas
     }
 
     private func sendVideo(_ sb: CMSampleBuffer) {

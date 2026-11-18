@@ -129,6 +129,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNaviga
         if let i = CommandLine.arguments.firstIndex(of: "--manual-pdf") { manualPDF(URL(fileURLWithPath: CommandLine.arguments[i + 1]), URL(fileURLWithPath: CommandLine.arguments[i + 2])) }
         if let i = CommandLine.arguments.firstIndex(of: "--import-test") { importTest(Array(CommandLine.arguments[(i + 1)...])) }
         if CommandLine.arguments.contains("--sounds-test") { soundsTest() }
+        if let i = CommandLine.arguments.firstIndex(of: "--layout-test") { layoutTest(URL(fileURLWithPath: CommandLine.arguments[i + 1])) }
         if let i = CommandLine.arguments.firstIndex(of: "--js-test") { jsTest(URL(fileURLWithPath: CommandLine.arguments[i + 1])) }
     }
 
@@ -384,6 +385,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNaviga
     }
 
     /// Streams the window for six seconds to a test RTMP server (no camera, microphone or system sound) and prints the status.
+    /// Go live camera layouts: draws one stream frame for each layout the page offers (a gradient stands in for the camera)
+    /// and saves them as PNG files in `dir`.
+    private func layoutTest(_ dir: URL) {
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            let js = "return JSON.stringify(S.pip.MODES.map(([m]) => [m, S.pip.rects({ mode: m, x: 0.8, y: 0.78, s: 0.24 }, 1280, 720)]))"
+            self.web.callAsyncJavaScript(js, arguments: [:], in: nil, in: .page) { r in
+                guard case .success(let v) = r, let str = v as? String, let arr = try? JSONSerialization.jsonObject(with: Data(str.utf8)) as? [[Any]] else { print("LAYOUTTEST failed", r); exit(1) }
+                let cfg = WKSnapshotConfiguration(); cfg.snapshotWidth = NSNumber(value: LiveSession.width)
+                self.web.takeSnapshot(with: cfg) { img, _ in
+                    guard let win = img?.cgImage(forProposedRect: nil, context: nil, hints: nil) else { print("LAYOUTTEST no snapshot"); exit(1) }
+                    let cam = CIFilter(name: "CILinearGradient", parameters: ["inputPoint0": CIVector(x: 0, y: 0), "inputPoint1": CIVector(x: 1280, y: 720),
+                                                                              "inputColor0": CIColor(red: 0.2, green: 0.5, blue: 0.9), "inputColor1": CIColor(red: 0.9, green: 0.3, blue: 0.6)])!.outputImage!.cropped(to: CGRect(x: 0, y: 0, width: 1280, height: 720))
+                    let s = LiveSession(web: self.web), ctx = CIContext()
+                    for item in arr {
+                        guard let mode = item.first as? String, let rects = item.last as? [String: Any] else { continue }
+                        let out = s.compose(win: win, camImg: cam, lay: LiveSession.layout(from: ["layout": rects]))
+                        if let cg = ctx.createCGImage(out, from: CGRect(x: 0, y: 0, width: LiveSession.width, height: LiveSession.height)),
+                           let png = NSBitmapImageRep(cgImage: cg).representation(using: .png, properties: [:]) {
+                            try? png.write(to: dir.appendingPathComponent(mode + ".png")); print("LAYOUTTEST", mode, rects)
+                        }
+                    }
+                    exit(0)
+                }
+            }
+        }
+    }
+
     private func liveTest(_ url: String, _ key: String) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             LiveSession.systemSound = false
@@ -1026,12 +1055,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNaviga
             let platform = body["platform"] as? String ?? "custom"
             if body["remember"] as? Bool ?? false { LiveSession.saveKey(platform, url: url, key: key) }
             let s = LiveSession(web: web)
+            s.setLayout(LiveSession.layout(from: body))
             live = s
             s.start(url: url, key: key, camera: body["camera"] as? Bool ?? false, mic: body["mic"] as? Bool ?? false) { err in
                 if err != nil { self.live = nil }
                 self.reply(body, err.map { ["error": $0] } ?? ["ok": true])
             }
         case "liveStop": live?.stop(); live = nil; reply(body, ["ok": true])
+        case "liveLayout": live?.setLayout(LiveSession.layout(from: body)); reply(body, ["ok": true])
         case "liveStatus": reply(body, live?.status ?? ["state": "idle"])
         case "liveKey": reply(body, LiveSession.loadKey(body["platform"] as? String ?? "") ?? [:])
         default: break
@@ -1344,6 +1375,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNaviga
         if op == "recStop" { stopRecording() }
         if op == "stems", let b64 = body["b64"] as? String { separateStems(wavBase64: b64) }
         if op == "save", let name = body["name"] as? String, let b64 = body["b64"] as? String { saveFile(name: name, base64: b64) }
+    }
+
+    /// The camera and microphone for camera clips in share videos (STRATUM's own page only; macOS asks the producer first).
+    @available(macOS 12.0, *)
+    func webView(_ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin, initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType, decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        decisionHandler(webView === web && frame.isMainFrame && origin.protocol == "file" ? .grant : .deny)
     }
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,

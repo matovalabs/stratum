@@ -373,8 +373,9 @@ public:
     std::thread videoThread;
     std::string message;
 
-    std::string start(HWND w, const std::string &url, const std::string &key, bool cam, bool mic) {
-        window = w;
+    std::mutex layoutLock; Layout layout;
+    std::string start(HWND w, const std::string &url, const std::string &key, bool cam, bool mic, const Layout &lay) {
+        window = w; layout = lay;
         MFStartup(MF_VERSION);
         std::string e = rtmp.connect(url, key);
         if (!e.empty()) return e;
@@ -394,8 +395,7 @@ public:
         MFShutdown();
     }
 private:
-    // The window (and camera) composed onto a 1280x720 frame 30 times a second. With the camera on, the window shrinks a
-    // little to leave a column on the right, and the camera box sits at the bottom of it, so nothing is covered.
+    // The window (and camera) composed onto a 1280x720 frame 30 times a second, placed by the producer's camera layout.
     std::mutex handoff; std::condition_variable ready;
     std::vector<uint8_t> pending; long long pendingAt = 0; bool havePending = false;
     std::thread encodeThread;
@@ -445,28 +445,37 @@ private:
                 captureMs = captureMs * 0.9 + (now() - c0) * 1000 * 0.1;
             }
             RECT all{0, 0, W, H}; FillRect(dc, &all, bg);
-            bool cam = camera.on;
-            const int pad = 12, bw = cam ? (int)(W * 0.17) : 0, bh = bw * 9 / 16;
-            int aw = W - (cam ? bw + pad * 3 : pad * 2), ah = H;
-            if (ww > 0 && wh > 0) {
+            Layout lay; { std::lock_guard<std::mutex> g(layoutLock); lay = layout; }
+            bool cam = camera.on && lay.hasCam;
+            auto toPx = [](const double r[4]) { RECT o{(LONG)std::lround(r[0] * W), (LONG)std::lround(r[1] * H), (LONG)std::lround((r[0] + r[2]) * W), (LONG)std::lround((r[1] + r[3]) * H)}; return o; };
+            auto frameOf = [&](RECT r) { RECT f{r.left - 2, r.top - 2, r.right + 2, r.bottom + 2}; FillRect(dc, &f, amber); };
+            auto full = [](RECT r) { return r.left <= 0 && r.top <= 0 && r.right >= W && r.bottom >= H; };
+            // The window, fitted inside its rectangle.
+            auto drawWindow = [&](RECT r, bool boxed) {
+                if (boxed) { frameOf(r); FillRect(dc, &r, bg); }
+                if (ww <= 0 || wh <= 0) return;
+                int aw = r.right - r.left, ah = r.bottom - r.top;
                 double s = std::min((double)aw / ww, (double)ah / wh);
-                int dw = (int)(ww * s), dh = (int)(wh * s), dx = cam ? pad : (W - dw) / 2, dy = (H - dh) / 2;
+                int dw = (int)(ww * s), dh = (int)(wh * s), dx = r.left + (aw - dw) / 2, dy = r.top + (ah - dh) / 2;
                 SetStretchBltMode(dc, HALFTONE); SetBrushOrgEx(dc, 0, 0, nullptr);
                 StretchBlt(dc, dx, dy, dw, dh, wdc, 0, 0, ww, wh, SRCCOPY);
-            }
-            if (cam) {
+            };
+            // The camera, filling its rectangle (cropped to its shape), mirrored like a selfie view.
+            auto drawCamera = [&](RECT r, bool boxed) {
                 std::lock_guard<std::mutex> g(camera.lock);
-                if (camera.fw > 0) {
-                    int x = W - bw - pad, y = H - bh - pad - 3;
-                    RECT fr{x - 2, y - 2, x + bw + 2, y + bh + 2}; FillRect(dc, &fr, amber);
-                    BITMAPINFO ci{}; ci.bmiHeader.biSize = sizeof ci.bmiHeader; ci.bmiHeader.biWidth = camera.fw; ci.bmiHeader.biHeight = camera.bottomUp ? camera.fh : -camera.fh; ci.bmiHeader.biPlanes = 1; ci.bmiHeader.biBitCount = 32;
-                    // Fill the box, cropping the camera picture to 16:9, mirrored like a selfie view.
-                    double s = std::max((double)bw / camera.fw, (double)bh / camera.fh);
-                    int sw = (int)(bw / s), sh = (int)(bh / s), sx = (camera.fw - sw) / 2, sy = (camera.fh - sh) / 2;
-                    SetStretchBltMode(dc, HALFTONE);
-                    StretchDIBits(dc, x + bw - 1, y, -bw, bh, sx, sy, sw, sh, camera.frame.data(), &ci, DIB_RGB_COLORS, SRCCOPY);
-                }
-            }
+                if (camera.fw <= 0) return;
+                if (boxed) frameOf(r);
+                int bw = r.right - r.left, bh = r.bottom - r.top;
+                BITMAPINFO ci{}; ci.bmiHeader.biSize = sizeof ci.bmiHeader; ci.bmiHeader.biWidth = camera.fw; ci.bmiHeader.biHeight = camera.bottomUp ? camera.fh : -camera.fh; ci.bmiHeader.biPlanes = 1; ci.bmiHeader.biBitCount = 32;
+                double s = std::max((double)bw / camera.fw, (double)bh / camera.fh);
+                int sw = (int)(bw / s), sh = (int)(bh / s), sx = (camera.fw - sw) / 2, sy = (camera.fh - sh) / 2;
+                SetStretchBltMode(dc, HALFTONE);
+                StretchDIBits(dc, r.right - 1, r.top, -bw, bh, sx, sy, sw, sh, camera.frame.data(), &ci, DIB_RGB_COLORS, SRCCOPY);
+            };
+            RECT mainR = toPx(lay.main), camR = toPx(lay.cam);
+            if (!cam) drawWindow(lay.hasCam ? all : mainR, false);   // camera off or not working: the window fills the frame
+            else if (lay.camTop) { drawWindow(mainR, false); drawCamera(camR, !full(camR)); }
+            else { drawCamera(camR, false); drawWindow(mainR, !full(mainR)); }
             GdiFlush();
             {   // hand the picture to the encoding thread (if it is still busy, the newest picture replaces the waiting one)
                 std::lock_guard<std::mutex> g(handoff);
@@ -491,10 +500,29 @@ Session *session = nullptr;
 std::wstring credName(const std::string &platform) { return L"STRATUM Live/" + wide(platform); }
 } // namespace
 
-std::string start(HWND w, const std::string &url, const std::string &key, bool camera, bool mic) {
+Layout layoutFrom(const Json &body) {
+    Layout l;
+    const Json &j = body["layout"];
+    auto rect = [](const Json &v, double out[4]) { if (v.type != Json::Array || v.a.size() != 4) return false; for (int i = 0; i < 4; i++) out[i] = v.a[i].num(); return true; };
+    if (j.type != Json::Object || !rect(j["main"], l.main)) {   // the original layout: the camera beside the window
+        const double cw = 0.24, ch = cw * W * 9 / 16 / H, pad = 12.0 / W;
+        double m[4] = {pad, 0, 1 - cw - pad * 3, 1}, c[4] = {1 - cw - pad, 1 - ch - 0.03, cw, ch};
+        std::copy(m, m + 4, l.main); std::copy(c, c + 4, l.cam); l.hasCam = true; return l;
+    }
+    l.hasCam = rect(j["cam"], l.cam);
+    l.camTop = j["camTop"].truthy(true);
+    return l;
+}
+
+void setLayout(const Layout &lay) {
+    std::lock_guard<std::mutex> g(sessionLock);
+    if (session) { std::lock_guard<std::mutex> l(session->layoutLock); session->layout = lay; }
+}
+
+std::string start(HWND w, const std::string &url, const std::string &key, bool camera, bool mic, const Layout &layout) {
     stop();
     auto s = new Session();
-    std::string e = s->start(w, url, key, camera, mic);
+    std::string e = s->start(w, url, key, camera, mic, layout);
     if (!e.empty()) { s->stop(); delete s; return e; }
     std::lock_guard<std::mutex> g(sessionLock); session = s;
     return "";

@@ -155,7 +155,7 @@ static void startWebView() {
                             args->get_Uri(&uri);
                             bool ours = uri && std::wstring(uri).rfind(std::wstring(L"https://") + HOST + L"/", 0) == 0;
                             CoTaskMemFree(uri);
-                            if (ours && kind == COREWEBVIEW2_PERMISSION_KIND_MICROPHONE) args->put_State(COREWEBVIEW2_PERMISSION_STATE_ALLOW);
+                            if (ours && (kind == COREWEBVIEW2_PERMISSION_KIND_MICROPHONE || kind == COREWEBVIEW2_PERMISSION_KIND_CAMERA)) args->put_State(COREWEBVIEW2_PERMISSION_STATE_ALLOW);   // camera: share-video camera clips
                             return S_OK;
                         }).Get(), nullptr);
 

@@ -572,8 +572,9 @@ bool op(const std::string &name, const Json &b) {
         // Connecting can take several seconds, so it happens off the window's thread; the answer goes back through the page.
         int req = b["req"].integer();
         std::string url = b["url"].str(), key = b["key"].str(); bool cam = b["camera"].truthy(), mic = b["mic"].truthy();
+        live::Layout lay = live::layoutFrom(b);
         std::thread([=] {
-            std::string e = live::start(mainWnd, url, key, cam, mic);
+            std::string e = live::start(mainWnd, url, key, cam, mic, lay);
             Json o; if (e.empty()) o["ok"] = true; else o["error"] = e;
             runJs(L"S.plug.cb(" + std::to_wstring(req) + L", " + wide(o.dump()) + L")");
         }).detach();
@@ -585,6 +586,7 @@ bool op(const std::string &name, const Json &b) {
         return true;
     }
     if (name == "liveStatus") { reply(b, live::status()); return true; }
+    if (name == "liveLayout") { live::setLayout(live::layoutFrom(b)); reply(b, Json::object()); return true; }
     if (name == "liveKey") { reply(b, live::loadKey(b["platform"].str())); return true; }
     return false;
 }
