@@ -246,17 +246,21 @@
   };
 
   // `draw(g, t, dt)` paints the frame for time t. Resolves to an MP4 Blob, or throws so the caller can fall back.
-  IO.renderOffline = async (codec, W, H, buf, draw, progress) => {
+  // `live`: record in real time instead, for clips with the producer's camera. The track plays through the speakers while
+  // each frame is drawn on time; `live.mic` (a MediaStream) is mixed into the sound, and `live.stop()` returning true ends
+  // the clip early, keeping what was recorded.
+  IO.renderOffline = async (codec, W, H, buf, draw, progress, live) => {
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-    const g = cv.getContext('2d'), frames = Math.max(1, Math.ceil(buf.duration * FPS)), bitrate = Math.round(14e6 * (W * H) / (1080 * 1920));
-    const v = { kind: 'video', w: W, h: H, timescale: FPS * 100, durs: [], sizes: [], times: [], keys: [], cts: [], data: [], config: null, duration: frames / FPS };
+    let frames = Math.max(1, Math.ceil(buf.duration * FPS));
+    const g = cv.getContext('2d'), bitrate = Math.round(14e6 * (W * H) / (1080 * 1920));
+    const v = { kind: 'video', w: W, h: H, timescale: FPS * 100, durs: [], sizes: [], times: [], keys: [], cts: [], ts: [], data: [], config: null, duration: frames / FPS };
     let failed = null;
     const ve = new VideoEncoder({
       output: (chunk, meta) => {
         if (meta && meta.decoderConfig && meta.decoderConfig.description && !v.config) v.config = new Uint8Array(meta.decoderConfig.description.buffer || meta.decoderConfig.description);
         const d = new Uint8Array(chunk.byteLength); chunk.copyTo(d);
         const i = v.data.length;
-        v.data.push(d); v.sizes.push(d.length); v.durs.push(100); v.times.push(i / FPS); v.cts.push(Math.round((chunk.timestamp * FPS * 100) / 1e6) - i * 100);
+        v.data.push(d); v.sizes.push(d.length); v.durs.push(100); v.times.push(i / FPS); v.cts.push(Math.round((chunk.timestamp * FPS * 100) / 1e6) - i * 100); v.ts.push(chunk.timestamp);
         if (chunk.type === 'key') v.keys.push(v.data.length);
       },
       error: (e) => { failed = e; },
@@ -278,6 +282,56 @@
     let aok = false; try { aok = (await AudioEncoder.isConfigSupported(acfg)).supported; } catch (e) {}
     if (!aok) delete acfg.bitrateMode;
     ae.configure(acfg);
+    // Real time: play the track and listen to the microphone while the frames are drawn on the clock.
+    let ctx = null, src = null, t0 = 0, micParts = [], proc = null, msrc = null;
+    if (live) {
+      ctx = E.ensure(); if (ctx.state !== 'running') await ctx.resume();
+      src = ctx.createBufferSource(); src.buffer = buf; src.connect(ctx.destination);
+      if (live.mic && live.mic.getAudioTracks().length) {
+        msrc = ctx.createMediaStreamSource(live.mic); proc = ctx.createScriptProcessor(4096, 1, 1);
+        const mute = ctx.createGain(); mute.gain.value = 0;
+        proc.onaudioprocess = (e) => { if (t0) micParts.push([e.playbackTime - t0, new Float32Array(e.inputBuffer.getChannelData(0))]); };
+        msrc.connect(proc); proc.connect(mute); mute.connect(ctx.destination);
+      }
+      t0 = ctx.currentTime + 0.25; src.start(t0);
+    }
+    let i = 0, nextKey = 0;
+    for (; i < frames; i++) {
+      if (failed) throw failed;
+      if (live) {
+        if (live.stop && live.stop()) break;
+        const due = t0 + i / FPS;
+        while (ctx.currentTime < due) await new Promise((r) => setTimeout(r, Math.max(1, (due - ctx.currentTime) * 1000 - 2)));
+        // Running behind: jump to the frame that is due now, so the camera stays in time with the track.
+        const now = Math.floor((ctx.currentTime - t0) * FPS);
+        if (now > i) i = Math.min(frames - 1, now);
+      }
+      draw(g, i / FPS, 1 / FPS);
+      const vf = new VideoFrame(cv, { timestamp: Math.round((i * 1e6) / FPS), duration: Math.round(1e6 / FPS) });
+      const key = i >= nextKey; if (key) nextKey = i + FPS * 2;   // a keyframe every 2 seconds, even when frames are skipped
+      ve.encode(vf, { keyFrame: key }); vf.close();
+      if (ve.encodeQueueSize > 6) await new Promise((r) => { const w = () => (ve.encodeQueueSize > 2 && !failed ? setTimeout(w, 2) : r()); w(); });
+      if (progress && i % 15 === 0) { progress(i / frames); if (!live) await new Promise((r) => setTimeout(r, 0)); }
+    }
+    if (live) {
+      try { src.stop(); } catch (e) {}
+      if (proc) { proc.onaudioprocess = null; try { msrc.disconnect(); proc.disconnect(); } catch (e) {} }
+      if (i < frames) { frames = Math.max(1, i); v.duration = frames / FPS; }
+      // The clip's sound: the track up to where it stopped (faded out if cut short), plus the microphone.
+      const n = Math.min(buf.length, Math.round((frames / FPS) * buf.sampleRate)), out = new AudioBuffer({ length: n, numberOfChannels: Math.min(2, buf.numberOfChannels), sampleRate: buf.sampleRate });
+      const fade = n < buf.length ? Math.min(n, Math.round(0.4 * buf.sampleRate)) : 0;
+      for (let c = 0; c < out.numberOfChannels; c++) { const d = out.getChannelData(c), from = buf.getChannelData(c); for (let k = 0; k < n; k++) d[k] = from[k] * (k >= n - fade ? (n - k) / fade : 1); }
+      const ratio = ctx.sampleRate / buf.sampleRate;
+      for (const [at, part] of micParts) {
+        const start = Math.round(at * buf.sampleRate);
+        for (let k = 0; k < part.length / ratio; k++) {
+          const j = start + k; if (j < 0 || j >= n) continue;
+          const x = part[Math.min(part.length - 1, Math.floor(k * ratio))];
+          for (let c = 0; c < out.numberOfChannels; c++) out.getChannelData(c)[j] += x * 0.9;
+        }
+      }
+      buf = out; a.duration = buf.duration;
+    }
     for (let at = 0; at < buf.length; at += 1024) {
       const n = Math.min(1024, buf.length - at), planes = new Float32Array(n * ch);
       for (let c = 0; c < ch; c++) planes.set(buf.getChannelData(c).subarray(at, at + n), c * n);
@@ -285,15 +339,13 @@
       ae.encode(ad); ad.close();
     }
     const flushA = ae.flush();
-    for (let i = 0; i < frames; i++) {
-      if (failed) throw failed;
-      draw(g, i / FPS, 1 / FPS);
-      const vf = new VideoFrame(cv, { timestamp: Math.round((i * 1e6) / FPS), duration: Math.round(1e6 / FPS) });
-      ve.encode(vf, { keyFrame: i % (FPS * 2) === 0 }); vf.close();
-      if (ve.encodeQueueSize > 6) await new Promise((r) => { const w = () => (ve.encodeQueueSize > 2 && !failed ? setTimeout(w, 2) : r()); w(); });
-      if (progress && i % 15 === 0) { progress(i / frames); await new Promise((r) => setTimeout(r, 0)); }
-    }
     await ve.flush(); await flushA; ve.close(); ae.close();
+    // Real time skips frames it was too busy for, so each frame lasts until the next one's time.
+    if (live) {
+      v.times = v.ts.map((t) => t / 1e6); v.cts = v.ts.map(() => 0);
+      v.durs = v.ts.map((t, k) => Math.max(1, Math.round((((k + 1 < v.ts.length ? v.ts[k + 1] : t + 1e6 / FPS) - t) * FPS * 100) / 1e6)));
+      v.duration = v.ts.length ? v.ts[v.ts.length - 1] / 1e6 + 1 / FPS : 0;
+    }
     if (failed) throw failed;
     if (!v.config || !a.config || !v.data.length) throw new Error('the encoder gave no output');
     if (progress) progress(1);
@@ -311,7 +363,8 @@
     return vis;
   }
 
-  IO.webShareRender = async (target, title, artist, buf, peaks, progress, look) => {
+  // `pip`: { lay, video, mic, stop } to put the producer's camera in the video (see pip.js). Those clips record in real time.
+  IO.webShareRender = async (target, title, artist, buf, peaks, progress, look, pip) => {
     const [W0, H0, label] = SHAPES[target] || [1080, 1920, '9x16'], W = Math.round(W0 * HALF), H = Math.round(H0 * HALF);
     const safe = (title || 'Untitled').replace(/[\\/:*?"<>|]+/g, '').trim() || 'Untitled';
     const audio = new File([IO.wav(buf)], `${safe}.wav`, { type: 'audio/wav' });
@@ -322,15 +375,26 @@
     const g = cv.getContext('2d'), mark0 = await loadMark(), bg = base(title, artist, W, H, mark0);
     // Full quality first: every frame drawn at full size, then encoded. Falls back to recording in real time.
     const FW = W0, FH = H0, codec = await IO.canRenderOffline(FW, FH);
+    const withCam = !!(pip && S.pip && S.pip.camera(pip.lay));
+    if (withCam && !codec) throw new Error('This device cannot make camera clips. Update your browser, or use the Mac or Windows app.');
     if (codec) {
       try {
-        const fbg = base(title, artist, FW, FH, mark0), vis = await visualsFor(look, FW, FH, new BufferAnalyser(buf));
-        const blob = await IO.renderOffline(codec, FW, FH, buf, (fg, t, dt) => {
-          if (vis) { vis.an.at(t); vis.a.read(t, 1, (t * (S.proj.bpm || 120)) / 60); vis.r.render(vis.a, vis.tiles, [1, 1], {}, dt); fg.drawImage(vis.cv, 0, 0, FW, FH); brandOver(fg, FW, FH, title, artist, mark0); }
-          else frame(fg, fbg, peaks, Math.min(1, t / buf.duration), clock(t), FW, FH);
-        }, progress);
-        return { video: new File([blob], `${safe} ${label}.mp4`, { type: 'video/mp4' }), audio };
-      } catch (e) { console.warn('Full-quality video failed, recording in real time instead:', e); }
+        // With the camera, the beat is drawn at the size of its part of the frame, then placed by the layout.
+        const R = withCam ? S.pip.rects(pip.lay, FW, FH) : null, MW = withCam ? Math.round(R.main[2] * FW) : FW, MH = withCam ? Math.round(R.main[3] * FH) : FH;
+        // Camera clips are drawn in real time, so the Visuals behind the camera render at half size to keep up.
+        const VS = withCam ? 0.5 : 1, fbg = base(title, artist, MW, MH, mark0), vis = await visualsFor(look, Math.round(MW * VS), Math.round(MH * VS), new BufferAnalyser(buf));
+        const drawMain = (fg, t, dt) => {
+          if (vis) { vis.an.at(t); vis.a.read(t, 1, (t * (S.proj.bpm || 120)) / 60); vis.r.render(vis.a, vis.tiles, [1, 1], {}, dt); fg.drawImage(vis.cv, 0, 0, MW, MH); brandOver(fg, MW, MH, title, artist, mark0); }
+          else frame(fg, fbg, peaks, Math.min(1, t / buf.duration), clock(t), MW, MH);
+        };
+        let draw = drawMain;
+        if (withCam) {
+          const mc = document.createElement('canvas'); mc.width = MW; mc.height = MH; const mg = mc.getContext('2d');
+          draw = (fg, t, dt) => { drawMain(mg, t, dt); S.pip.compose(fg, FW, FH, pip.lay, (gg, x, y, w, h) => gg.drawImage(mc, x, y, w, h), pip.video, { bg: BG, accent: AMBER }); };
+        }
+        const blob = await IO.renderOffline(codec, FW, FH, buf, draw, progress, withCam ? { mic: pip.mic, stop: pip.stop } : null);
+        return { video: new File([blob], `${safe} ${label}${withCam ? ' camera' : ''}.mp4`, { type: 'video/mp4' }), audio };
+      } catch (e) { if (withCam) throw e; console.warn('Full-quality video failed, recording in real time instead:', e); }
     }
     cv.width = W; cv.height = H;
     frame(g, bg, peaks, 0, clock(0), W, H);

@@ -143,10 +143,26 @@
   U.libSearch = (v) => { U.libQuery = v; clearTimeout(U.libT); U.libT = setTimeout(() => A.sounds(), 250); };
   U.shareProgress = (f) => U.toast(`Making your STRATUM video… ${Math.round(f * 100)}%`);
   U.shareDone = (ok, msg) => U.toast(msg, !ok);
-  async function webShare(target, label, title, artist, clip, look) {
+  async function webShare(target, label, title, artist, clip, look, withCam) {
     showPop(`<h3>Making your ${esc(label)} video…</h3><p class="hint">STRATUM draws the video frame by frame at full size, which usually takes less time than the track lasts. Keep STRATUM open.</p><p class="caprec"><span id="wsPct">0%</span></p>`);
     const mix = await IO.share(target, title, artist, clip, true);
-    const r = await IO.webShareRender(target, title, artist, mix.buf, mix.peaks, (p) => { const el = $('#wsPct'); if (el) el.textContent = Math.round(p * 100) + '%'; }, look);
+    // Camera clip: open the camera (and microphone), wait until the producer is ready, then record while the track plays.
+    let pip = null;
+    if (withCam) {
+      const lay = S.pip.get('share'), cam = await S.pip.openCamera(lay.mic);
+      showPop(`<h3>Ready to record your ${esc(label)} clip</h3><p class="hint">The track plays from the start and your camera records with it${lay.mic ? ', with your microphone (use headphones so the beat isn’t recorded twice)' : ''}. Press Stop to end early; the clip keeps what was recorded.</p>` +
+        `<p><button data-act="pipStart" class="primary">● Start recording</button> <button data-act="closePop">Cancel</button></p>`);
+      const go = await new Promise((res) => (U.pipReady = res));
+      U.pipReady = null;
+      if (!go) { S.pip.closeCamera(true); return; }
+      U.pipStopNow = false;
+      showPop(`<h3>● Recording your ${esc(label)} clip</h3><p class="caprec"><span id="wsPct">0%</span></p><p><button data-act="pipStop" class="primary">■ Stop</button></p>`);
+      pip = { lay, video: cam.video, mic: lay.mic ? cam.stream : null, stop: () => U.pipStopNow };
+    }
+    let r;
+    try { r = await IO.webShareRender(target, title, artist, mix.buf, mix.peaks, (p) => { const el = $('#wsPct'); if (el) el.textContent = Math.round(p * 100) + '%'; }, look, pip); }
+    finally { if (pip) S.pip.closeCamera(true); }
+    if (pip) showPop(`<h3>Finishing your ${esc(label)} clip…</h3>`);
     if (IO.host() && r.video) {
       // The Mac or Windows app takes it from here: the share sheet, Mail, Photos or the upload page, as with every share.
       closePop();
@@ -729,7 +745,7 @@
 
   // ---------- popovers ----------
   const showPop = (html) => { const p = $('#pop'); p.innerHTML = `<div class="popbox">${html}</div>`; p.hidden = false; const i = p.querySelector('input'); if (i) i.focus(); };
-  const closePop = () => ($('#pop').hidden = true);
+  const closePop = () => { $('#pop').hidden = true; if (S.pip && S.pip.unmount) S.pip.unmount(); if (U.pipReady) { U.pipReady(false); U.pipReady = null; } };
   $('#pop').addEventListener('pointerdown', (e) => { if (e.target.id === 'pop') closePop(); });
   const KEYMAP = {
     common: [['Space', 'play', 'Play / stop'], ['Tab', 'flip', 'Flip the rack to its back panel'], ['Meta+z', 'undo', 'Undo'], ['Meta+s', 'save', 'Save project'], ['Meta+o', 'open', 'Open / import'],
@@ -935,6 +951,7 @@
         `<label>Title <input id="shTitle" value="${esc(p.name || 'Untitled')}"></label><label>Artist <input id="shArtist" value="${esc(p.artist || '')}" placeholder="Your artist name"></label>` +
         `<label>Look <select id="shLook">${opts([['classic', 'STRATUM waveform'], ...(P().visuals ? [['current', 'My Visuals (as set up now)']] : []), ...Object.keys(S.vis.FACTORY).map((n) => [n, 'Visuals: ' + n])], U.shareLook || 'classic')}</select></label>` +
         `<label>Length <select id="shClip">${opts([['', 'Whole track'], ['60', 'First 60 seconds'], ['30', 'First 30 seconds'], ['15', 'First 15 seconds']], '')}</select></label>` +
+        S.pip.editor('share', { mic: true }) +
         (mac ? `<div class="stock"><b>Send</b> ${go('messages', 'Text (Messages)')}${go('mail', 'Email')}${go('airdrop', 'AirDrop')}${go('more', 'More…')}</div>`
           : win ? `<div class="stock"><b>Send</b> ${go('mail', 'Email the audio')}${go('more', 'Share the video (Nearby Share, Phone Link, apps)…')}</div>`
           : `<div class="stock"><b>Send</b> ${go('more', 'Text, email or another app…')}</div>`) +
@@ -942,6 +959,7 @@
         `<p class="hint">Each gets the right shape: 9:16 for Stories, Reels, TikTok and Shorts, 4:5 for Instagram, Facebook and Threads posts, square for X. ${mac ? 'STRATUM opens the upload page and shows the video in Finder, ready to drag in. Instagram Stories can only be posted from the phone app, so that video is saved to Photos.' : win ? 'The video is recorded as the track plays once, so it takes as long as the clip. It is saved in Videos › STRATUM; STRATUM then opens the upload page and selects the video in File Explorer, ready to drag in.' : 'The video is recorded as the track plays once, so it takes as long as the clip. Then share it to the app, or save it.'}</p>` +
         (!IO.host() ? '' : `<div class="stock"><b>Go live</b> <button data-act="live" data-p="twitch">Twitch</button><button data-act="live" data-p="youtube">YouTube</button><button data-act="live" data-p="instagram">Instagram</button><button data-act="live" data-p="tiktok">TikTok</button><button data-act="live" data-p="custom">Other (RTMP)</button></div>`) +
         `${go('save', 'Just save the files')} <button data-act="closePop">Cancel</button>`);
+      S.pip.mount('share');
     },
     // Go live: the STRATUM window (and the producer's camera, if they allow it) streams to Twitch, YouTube, Instagram or
     // TikTok using the server address and stream key each platform gives out.
@@ -952,15 +970,19 @@
       showPop(`<h3>Go live on ${L.name}</h3><p class="hint">Viewers see the STRATUM window as you work and hear what your ${IO.platform === 'windows' ? 'PC' : 'Mac'} plays. ${L.how}</p>` +
         `<label>Server URL <input id="lvUrl" value="${esc(saved.url || L.url)}" placeholder="rtmp://… or rtmps://…"></label>` +
         `<label>Stream key <input id="lvKey" type="password" value="${esc(saved.key || '')}" placeholder="Paste your stream key" autocomplete="off"></label>` +
-        `<div class="livechecks"><label><input type="checkbox" id="lvCam" checked> Show my camera in a box</label><label><input type="checkbox" id="lvMic"> Add my microphone</label><label><input type="checkbox" id="lvVis" ${U.liveVis ? 'checked' : ''}> Show Visuals instead of the window</label><label><input type="checkbox" id="lvRem" ${saved.key ? 'checked' : ''}> Remember for next time</label></div>` +
+        `<div class="livechecks"><label><input type="checkbox" id="lvMic"> Add my microphone</label><label><input type="checkbox" id="lvVis" ${U.liveVis ? 'checked' : ''}> Show Visuals instead of the window</label><label><input type="checkbox" id="lvRem" ${saved.key ? 'checked' : ''}> Remember for next time</label></div>` +
+        S.pip.editor('live') +
         `<p class="hint">${IO.platform === 'windows' ? 'Windows may ask to allow the camera and microphone (Settings › Privacy &amp; security). Saved keys go in Windows Credential Manager.' : "The first time, macOS asks to allow the camera, the microphone and Screen &amp; System Audio Recording (for the sound). Saved keys go in your Mac's Keychain."} Keep your stream key private: anyone with it can stream to your channel.</p>` +
         `<p><button data-act="liveGo" data-p="${p}" class="primary">● Go live</button> <button data-act="closePop">Cancel</button></p>`);
+      S.pip.mount('live', { mainLabel: () => ($('#lvVis') && $('#lvVis').checked ? 'Visuals' : 'STRATUM window') });
     },
     async liveGo(el) {
       const url = $('#lvUrl').value.trim(), key = $('#lvKey').value.trim(), p = el.dataset.p;
       if (!/^rtmps?:\/\//i.test(url)) return U.toast('Paste the server URL from your platform; it starts with rtmp:// or rtmps://.', true);
       if (!key) return U.toast('Paste your stream key first.', true);
-      const body = { op: 'liveStart', platform: p, url, key, camera: $('#lvCam').checked, mic: $('#lvMic').checked, remember: $('#lvRem').checked };
+      // The camera layout goes to the app as rectangles (fractions of the 1280x720 frame); see pip.js.
+      const lay = S.pip.get('live'), layout = S.pip.rects(lay, 1280, 720);
+      const body = { op: 'liveStart', platform: p, url, key, camera: S.pip.camera(lay), layout, mic: $('#lvMic').checked, remember: $('#lvRem').checked };
       U.liveVis = $('#lvVis').checked;
       closePop();
       U.liveOn = true; livePill('Connecting…', true);
@@ -994,7 +1016,8 @@
       P().artist = artist;
       const look = U.shareLook = $('#shLook') ? $('#shLook').value : 'classic';
       closePop();
-      if (!IO.native() || look !== 'classic') return webShare(el.dataset.target, el.textContent, title, artist, clip, look).catch((e) => { closePop(); U.toast('Could not share: ' + (e.message || e), true); });
+      const cam = S.pip.camera(S.pip.get('share'));
+      if (!IO.native() || look !== 'classic' || cam) return webShare(el.dataset.target, el.textContent, title, artist, clip, look, cam).catch((e) => { closePop(); S.pip.closeCamera(true); U.toast('Could not share: ' + (e.message || e), true); });
       IO.share(el.dataset.target, title, artist, clip).catch((e) => U.toast('Could not share: ' + (e.message || e), true));
     },
     // Web, Windows, phones and tablets: hand the finished files to the system share sheet, or save them.
@@ -1024,9 +1047,14 @@
     manual() { closePop(); if (IO.native()) IO.native().postMessage({ op: 'manual' }); else window.open('manual.pdf'); },
     help() {
       const row = ([k, , l]) => `<tr><td><kbd>${esc((MAC ? k.replace('Meta', '⌘').replace('Alt', '⌥').replace('Shift', '⇧') : k.replace('Meta', 'Ctrl')).replace(/\+/g, ' '))}</kbd></td><td>${esc(l)}</td></tr>`;
-      showPop(`<h3>Shortcuts — ${esc(SKIN_NAMES[U.skin])}</h3><table class="keys">${[...KEYMAP.common, ...KEYMAP[U.skin]].map(row).join('')}</table><p><button data-act="tour">Take the tour</button> <button data-act="manual">Open the Owner’s Manual</button></p><p class="hint">Switching the Comfort Skin changes both the layout and this key map. With “Keys” on, letter keys play notes instead.</p><button data-act="closePop">Close</button>`);
+      showPop(`<h3>Shortcuts — ${esc(SKIN_NAMES[U.skin])}</h3><table class="keys">${[...KEYMAP.common, ...KEYMAP[U.skin]].map(row).join('')}</table><p><button data-act="tour">Take the tour</button> <button data-act="manual">Open the Owner’s Manual</button>${IO.host() ? ' <button data-act="updateCheck">Check for updates</button>' : ''}</p><p class="hint">STRATUM Alpha ${esc(S.ALPHA || '')}</p><p class="hint">Switching the Comfort Skin changes both the layout and this key map. With “Keys” on, letter keys play notes instead.</p><button data-act="closePop">Close</button>`);
     },
     closePop,
+    updateCheck() { S.update.check(true); },
+    pipStart() { if (U.pipReady) { const f = U.pipReady; U.pipReady = null; f(true); } },
+    pipStop() { U.pipStopNow = true; },
+    updateGo() { const b = $('#updateBar'); if (b && b.dataset.page) location.href = b.dataset.page; },   // the app opens it in the default browser
+    updateLater() { const b = $('#updateBar'); if (b) b.hidden = true; },
     selTrack(el) { U.track = el.dataset.t; U.note = null; if (U.skin === 'session') U.bottom.session = 'devices'; render(); },
     selScene(el) { U.scene = el.dataset.s; U.note = null; U.region = null; if (!E.playing || E.mode === 'scene') E.sceneId = U.scene; render(); },
     cell(el) { U.track = el.dataset.t; U.scene = el.dataset.s; U.note = null; U.region = null; U.bottom.session = 'editor'; if (!E.playing) E.sceneId = U.scene; render(); },
