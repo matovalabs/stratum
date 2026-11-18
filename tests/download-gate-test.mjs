@@ -96,6 +96,14 @@ check(r.headers.get('location') === '/?signin=failed', 'a failed Discord sign-in
 r = await call('logout', '/api/logout', sess);
 check(setCookie(r, 'stratum_session') === 'stratum_session=', 'sign out clears the session');
 
+process.env.DOWNLOAD_TAG = 'v0.1.0-alpha.11.3';
+r = await call('latest', '/api/latest');
+const lj = await r.json();
+check(lj.alpha === '11.3' && lj.tag === 'v0.1.0-alpha.11.3' && lj.page === 'https://download.test/#download', 'update check endpoint reports the newest alpha and the download page');
+process.env.DOWNLOAD_TAG = 'nonsense';
+r = await call('latest', '/api/latest');
+check(r.status === 404, 'update check endpoint refuses a tag it cannot read');
+
 fake.close();
 console.log(fails ? fails + ' failed' : 'all passed');
 process.exit(fails ? 1 : 0);

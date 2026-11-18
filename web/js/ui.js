@@ -1024,9 +1024,12 @@
     manual() { closePop(); if (IO.native()) IO.native().postMessage({ op: 'manual' }); else window.open('manual.pdf'); },
     help() {
       const row = ([k, , l]) => `<tr><td><kbd>${esc((MAC ? k.replace('Meta', '⌘').replace('Alt', '⌥').replace('Shift', '⇧') : k.replace('Meta', 'Ctrl')).replace(/\+/g, ' '))}</kbd></td><td>${esc(l)}</td></tr>`;
-      showPop(`<h3>Shortcuts — ${esc(SKIN_NAMES[U.skin])}</h3><table class="keys">${[...KEYMAP.common, ...KEYMAP[U.skin]].map(row).join('')}</table><p><button data-act="tour">Take the tour</button> <button data-act="manual">Open the Owner’s Manual</button></p><p class="hint">Switching the Comfort Skin changes both the layout and this key map. With “Keys” on, letter keys play notes instead.</p><button data-act="closePop">Close</button>`);
+      showPop(`<h3>Shortcuts — ${esc(SKIN_NAMES[U.skin])}</h3><table class="keys">${[...KEYMAP.common, ...KEYMAP[U.skin]].map(row).join('')}</table><p><button data-act="tour">Take the tour</button> <button data-act="manual">Open the Owner’s Manual</button>${IO.host() ? ' <button data-act="updateCheck">Check for updates</button>' : ''}</p><p class="hint">STRATUM Alpha ${esc(S.ALPHA || '')}</p><p class="hint">Switching the Comfort Skin changes both the layout and this key map. With “Keys” on, letter keys play notes instead.</p><button data-act="closePop">Close</button>`);
     },
     closePop,
+    updateCheck() { S.update.check(true); },
+    updateGo() { const b = $('#updateBar'); if (b && b.dataset.page) location.href = b.dataset.page; },   // the app opens it in the default browser
+    updateLater() { const b = $('#updateBar'); if (b) b.hidden = true; },
     selTrack(el) { U.track = el.dataset.t; U.note = null; if (U.skin === 'session') U.bottom.session = 'devices'; render(); },
     selScene(el) { U.scene = el.dataset.s; U.note = null; U.region = null; if (!E.playing || E.mode === 'scene') E.sceneId = U.scene; render(); },
     cell(el) { U.track = el.dataset.t; U.scene = el.dataset.s; U.note = null; U.region = null; U.bottom.session = 'editor'; if (!E.playing) E.sceneId = U.scene; render(); },

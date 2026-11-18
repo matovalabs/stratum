@@ -31,3 +31,7 @@ Test it with `node tests/download-gate-test.mjs`, which uses a stand-in Discord.
 4. **The files.** They live on a release in the private repository `matovalabs/stratum-downloads`. Set `DOWNLOAD_REPO`, `DOWNLOAD_TAG` and `DOWNLOAD_TOKEN` (a fine-grained GitHub token with read-only Contents access to that repository only). Members then get a signed link that expires in minutes. Without a token the site falls back to the `DOWNLOAD_*_URL` addresses. Each release: upload the files there and update `DOWNLOAD_TAG`.
 
 The gate is for building the community, not for copy protection. A member could share a file's address, and the source code is public on GitHub. To change that, give each release's files new addresses.
+
+## Update check
+
+`GET /api/latest` returns `{alpha, tag, page}` from `DOWNLOAD_TAG` (for example `v0.1.0-alpha.11.3` gives `11.3`). The Mac and Windows apps call it at launch and compare with `S.ALPHA` in `web/js/version.js`. Changing `DOWNLOAD_TAG` at each release is what tells installed apps a new version exists.

@@ -11,6 +11,15 @@
       ]
     },
     {
+      "source": "/api/latest",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {

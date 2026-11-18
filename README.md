@@ -11,6 +11,8 @@ STRATUM has one project model and five switchable layouts ("Comfort Skins"): Pat
    - double-click it once, then open **System Settings › Privacy & Security** and click **Open Anyway**, or
    - run `xattr -dr com.apple.quarantine /Applications/STRATUM.app` in Terminal.
 
+The Mac and Windows apps check for a newer alpha a few seconds after launch (and from ? › Check for updates) and show a bar linking to the download page; nothing installs by itself. The web app on phones and browsers updates itself when reloaded.
+
 Requires macOS 12 or later. Runs on Apple silicon and Intel; AI stem separation is Apple silicon only.
 
 ### Visuals

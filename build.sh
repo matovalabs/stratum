@@ -3,6 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 VERSION="0.1.0"
+ALPHA="$(sed -n "s/.*ALPHA = '\(.*\)'.*/\1/p" web/js/version.js)"   # the alpha number, kept in one place
 OUT="dist"
 APP="$OUT/STRATUM.app"
 rm -rf "$OUT" build
@@ -57,7 +58,7 @@ cat > "$APP/Contents/Info.plist" <<EOF
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleVersion</key><string>$ALPHA</string>
   <key>LSMinimumSystemVersion</key><string>12.0</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.music</string>
   <key>NSPhotoLibraryAddUsageDescription</key><string>STRATUM saves your shared track videos to Photos so you can post them from your phone, for example as an Instagram Story.</string>
