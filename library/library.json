@@ -4746,6 +4746,27 @@
 "collection": "Producer Space (CC0)"
 },
 {
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Amapiano Piano Chord C4.flac",
+"name": "Amapiano Piano Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "amapiano afro house"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Classical Grand Piano C4.flac",
+"name": "Classical Grand Piano C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "classical orchestral cinematic"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Drill Dark Piano Chord C4.flac",
+"name": "Drill Dark Piano Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "drill uk drill trap"
+},
+{
 "path": "STRATUM Originals/Piano and Keys/Piano and Keys - Electric Piano FM C4.flac",
 "name": "Electric Piano FM C4",
 "category": "Piano and Keys",
@@ -4758,10 +4779,101 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Gospel Piano Chord C4.flac",
+"name": "Gospel Piano Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "gospel soul"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Hip hop Dusty Keys Chord C4.flac",
+"name": "Hip hop Dusty Keys Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "hip hop boom bap lo-fi soul"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - House Piano Chord C4.flac",
+"name": "House Piano Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "house dance"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Jazz Piano Chord C4.flac",
+"name": "Jazz Piano Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "jazz swing"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Lo-fi Keys Chord C4.flac",
+"name": "Lo-fi Keys Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "lo-fi chill hip hop"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Pop Piano Chord C4.flac",
+"name": "Pop Piano Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "pop dance"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - R&B Rhodes Chord C4.flac",
+"name": "R&B Rhodes Chord C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "r&b soul"
+},
+{
+"path": "STRATUM Originals/Piano and Keys/Piano and Keys - Salsa Montuno Piano C4.flac",
+"name": "Salsa Montuno Piano C4",
+"category": "Piano and Keys",
+"collection": "STRATUM Originals",
+"genres": "salsa latin"
+},
+{
 "path": "STRATUM Originals/Piano and Keys/Piano and Keys - Soft Keys C4.flac",
 "name": "Soft Keys C4",
 "category": "Piano and Keys",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Strings/Strings - Cinematic Staccato Strings C3.flac",
+"name": "Cinematic Staccato Strings C3",
+"category": "Strings",
+"collection": "STRATUM Originals",
+"genres": "cinematic trailer score"
+},
+{
+"path": "STRATUM Originals/Strings/Strings - Classical Cello C3.flac",
+"name": "Classical Cello C3",
+"category": "Strings",
+"collection": "STRATUM Originals",
+"genres": "classical orchestral cinematic"
+},
+{
+"path": "STRATUM Originals/Strings/Strings - Classical Pizzicato C4.flac",
+"name": "Classical Pizzicato C4",
+"category": "Strings",
+"collection": "STRATUM Originals",
+"genres": "classical orchestral cinematic"
+},
+{
+"path": "STRATUM Originals/Strings/Strings - Classical String Ensemble C4.flac",
+"name": "Classical String Ensemble C4",
+"category": "Strings",
+"collection": "STRATUM Originals",
+"genres": "classical orchestral cinematic"
+},
+{
+"path": "STRATUM Originals/Strings/Strings - Folk Fiddle C4.flac",
+"name": "Folk Fiddle C4",
+"category": "Strings",
+"collection": "STRATUM Originals",
+"genres": "folk acoustic indie"
 },
 {
 "path": "STRATUM Originals/Cymbals/Cymbals - Crash Noise.flac",
@@ -4770,10 +4882,31 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Cymbals/Cymbals - Jazz Ride.flac",
+"name": "Jazz Ride",
+"category": "Cymbals",
+"collection": "STRATUM Originals",
+"genres": "jazz swing"
+},
+{
+"path": "STRATUM Originals/Cymbals/Cymbals - Metal China.flac",
+"name": "Metal China",
+"category": "Cymbals",
+"collection": "STRATUM Originals",
+"genres": "metal rock"
+},
+{
 "path": "STRATUM Originals/Cymbals/Cymbals - Ride Noise.flac",
 "name": "Ride Noise",
 "category": "Cymbals",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Cymbals/Cymbals - Rock Crash.flac",
+"name": "Rock Crash",
+"category": "Cymbals",
+"collection": "STRATUM Originals",
+"genres": "rock indie"
 },
 {
 "path": "STRATUM Originals/Organ/Organ - Gospel Drawbar Organ C4.flac",
@@ -4782,10 +4915,283 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Organ/Organ - Gospel Organ Chord C4.flac",
+"name": "Gospel Organ Chord C4",
+"category": "Organ",
+"collection": "STRATUM Originals",
+"genres": "gospel soul"
+},
+{
+"path": "STRATUM Originals/Organ/Organ - House M-Organ Stab C4.flac",
+"name": "House M-Organ Stab C4",
+"category": "Organ",
+"collection": "STRATUM Originals",
+"genres": "house dance"
+},
+{
 "path": "STRATUM Originals/Organ/Organ - Reggae Bubble Organ C4.flac",
 "name": "Reggae Bubble Organ C4",
 "category": "Organ",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Organ/Organ - Soul Organ Chord C4.flac",
+"name": "Soul Organ Chord C4",
+"category": "Organ",
+"collection": "STRATUM Originals",
+"genres": "soul funk r&b gospel"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Afrobeats Drum Loop 105 BPM.flac",
+"name": "Afrobeats Drum Loop 105 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "afrobeats afro"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Amapiano Drum Loop 113 BPM.flac",
+"name": "Amapiano Drum Loop 113 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "amapiano afro house"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Blues Drum Loop 90 BPM.flac",
+"name": "Blues Drum Loop 90 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "blues rock"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Cinematic Drum Loop 90 BPM.flac",
+"name": "Cinematic Drum Loop 90 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "cinematic trailer score"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Country Drum Loop 110 BPM.flac",
+"name": "Country Drum Loop 110 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "country folk"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Dancehall Drum Loop 95 BPM.flac",
+"name": "Dancehall Drum Loop 95 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "dancehall reggae caribbean"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - DnB Drum Loop 174 BPM.flac",
+"name": "DnB Drum Loop 174 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "dnb drum and bass jungle"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Drill Drum Loop 142 BPM.flac",
+"name": "Drill Drum Loop 142 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "drill uk drill trap"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Dubstep Drum Loop 140 BPM.flac",
+"name": "Dubstep Drum Loop 140 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "dubstep edm bass"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Folk Drum Loop 100 BPM.flac",
+"name": "Folk Drum Loop 100 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "folk acoustic indie"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Funk Drum Loop 100 BPM.flac",
+"name": "Funk Drum Loop 100 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "funk soul disco"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Gospel Drum Loop 100 BPM.flac",
+"name": "Gospel Drum Loop 100 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "gospel soul"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Hip hop Drum Loop 90 BPM.flac",
+"name": "Hip hop Drum Loop 90 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "hip hop boom bap"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - House Drum Loop 124 BPM.flac",
+"name": "House Drum Loop 124 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "house dance"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Indie Drum Loop 110 BPM.flac",
+"name": "Indie Drum Loop 110 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "indie rock pop"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Jazz Drum Loop 120 BPM.flac",
+"name": "Jazz Drum Loop 120 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "jazz swing"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Latin Drum Loop 100 BPM.flac",
+"name": "Latin Drum Loop 100 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "latin bossa world"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Lo-fi Drum Loop 80 BPM.flac",
+"name": "Lo-fi Drum Loop 80 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "lo-fi chill hip hop"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Metal Drum Loop 160 BPM.flac",
+"name": "Metal Drum Loop 160 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "metal rock"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Pop Drum Loop 118 BPM.flac",
+"name": "Pop Drum Loop 118 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "pop dance"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Punk Drum Loop 180 BPM.flac",
+"name": "Punk Drum Loop 180 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "punk rock"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - R&B Drum Loop 75 BPM.flac",
+"name": "R&B Drum Loop 75 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "r&b soul"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Reggae Drum Loop 75 BPM.flac",
+"name": "Reggae Drum Loop 75 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "reggae dub roots"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Reggaeton Drum Loop 95 BPM.flac",
+"name": "Reggaeton Drum Loop 95 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "reggaeton latin dembow"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Rock Drum Loop 120 BPM.flac",
+"name": "Rock Drum Loop 120 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "rock indie"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Salsa Drum Loop 180 BPM.flac",
+"name": "Salsa Drum Loop 180 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "salsa latin"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Soul Drum Loop 92 BPM.flac",
+"name": "Soul Drum Loop 92 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "soul funk r&b"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Synthwave Drum Loop 100 BPM.flac",
+"name": "Synthwave Drum Loop 100 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "synthwave retro 80s"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Techno Drum Loop 130 BPM.flac",
+"name": "Techno Drum Loop 130 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "techno dance"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Trance Drum Loop 138 BPM.flac",
+"name": "Trance Drum Loop 138 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "trance edm dance"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - Trap Drum Loop 140 BPM.flac",
+"name": "Trap Drum Loop 140 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
+},
+{
+"path": "STRATUM Originals/Drum Loops/Drum Loops - World Drum Loop 100 BPM.flac",
+"name": "World Drum Loop 100 BPM",
+"category": "Drum Loops",
+"collection": "STRATUM Originals",
+"genres": "world folk afro"
+},
+{
+"path": "STRATUM Originals/FX/FX - Ambient Wind Texture.flac",
+"name": "Ambient Wind Texture",
+"category": "FX",
+"collection": "STRATUM Originals",
+"genres": "ambient chill cinematic"
+},
+{
+"path": "STRATUM Originals/FX/FX - Cinematic Braam C2.flac",
+"name": "Cinematic Braam C2",
+"category": "FX",
+"collection": "STRATUM Originals",
+"genres": "cinematic trailer score"
+},
+{
+"path": "STRATUM Originals/FX/FX - Cinematic Hit.flac",
+"name": "Cinematic Hit",
+"category": "FX",
+"collection": "STRATUM Originals",
+"genres": "cinematic trailer score"
+},
+{
+"path": "STRATUM Originals/FX/FX - Dub Siren.flac",
+"name": "Dub Siren",
+"category": "FX",
+"collection": "STRATUM Originals",
+"genres": "reggae dub roots dub"
 },
 {
 "path": "STRATUM Originals/FX/FX - Impact Boom.flac",
@@ -4824,6 +5230,20 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Vocals/Vocals - Drill Choir Pad C4.flac",
+"name": "Drill Choir Pad C4",
+"category": "Vocals",
+"collection": "STRATUM Originals",
+"genres": "drill uk drill trap cinematic"
+},
+{
+"path": "STRATUM Originals/Vocals/Vocals - Gospel Choir Ah C4.flac",
+"name": "Gospel Choir Ah C4",
+"category": "Vocals",
+"collection": "STRATUM Originals",
+"genres": "gospel soul"
+},
+{
 "path": "STRATUM Originals/Hats/Hats - Closed Hat Dark.flac",
 "name": "Closed Hat Dark",
 "category": "Hats",
@@ -4842,6 +5262,27 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Hats/Hats - Drill Hat.wav",
+"name": "Drill Hat",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "drill uk drill trap"
+},
+{
+"path": "STRATUM Originals/Hats/Hats - Hip hop Hat.wav",
+"name": "Hip hop Hat",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "hip hop boom bap"
+},
+{
+"path": "STRATUM Originals/Hats/Hats - House Open Hat.flac",
+"name": "House Open Hat",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "house dance"
+},
+{
 "path": "STRATUM Originals/Hats/Hats - Open Hat Long.flac",
 "name": "Open Hat Long",
 "category": "Hats",
@@ -4854,16 +5295,58 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Hats/Hats - R&B Hat.wav",
+"name": "R&B Hat",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "r&b soul"
+},
+{
 "path": "STRATUM Originals/Hats/Hats - Shaker Tick.wav",
 "name": "Shaker Tick",
 "category": "Hats",
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Hats/Hats - Soul Hat.wav",
+"name": "Soul Hat",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "soul funk r&b"
+},
+{
+"path": "STRATUM Originals/Hats/Hats - Techno Hat Metal.flac",
+"name": "Techno Hat Metal",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "techno dance"
+},
+{
+"path": "STRATUM Originals/Hats/Hats - Trap Hat Crisp.wav",
+"name": "Trap Hat Crisp",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
+},
+{
+"path": "STRATUM Originals/Hats/Hats - Trap Hat Roll.flac",
+"name": "Trap Hat Roll",
+"category": "Hats",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
+},
+{
 "path": "STRATUM Originals/Hats/Hats - Trap Hat.wav",
 "name": "Trap Hat",
 "category": "Hats",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Synths/Synths - Afrobeats Log Pluck C3.flac",
+"name": "Afrobeats Log Pluck C3",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "afrobeats afro"
 },
 {
 "path": "STRATUM Originals/Synths/Synths - Bell Pluck C3.flac",
@@ -4878,16 +5361,44 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Synths/Synths - Dancehall Stab C4.flac",
+"name": "Dancehall Stab C4",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "dancehall reggae caribbean"
+},
+{
 "path": "STRATUM Originals/Synths/Synths - House Chord Stab C3.flac",
 "name": "House Chord Stab C3",
 "category": "Synths",
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Synths/Synths - Indie Synth Lead C4.flac",
+"name": "Indie Synth Lead C4",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "indie rock pop"
+},
+{
 "path": "STRATUM Originals/Synths/Synths - Pluck C3.flac",
 "name": "Pluck C3",
 "category": "Synths",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Synths/Synths - Pop Pluck Chord C4.flac",
+"name": "Pop Pluck Chord C4",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "pop dance"
+},
+{
+"path": "STRATUM Originals/Synths/Synths - Reggaeton Pluck C4.flac",
+"name": "Reggaeton Pluck C4",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "reggaeton latin dembow"
 },
 {
 "path": "STRATUM Originals/Synths/Synths - Square Lead C3.flac",
@@ -4902,10 +5413,38 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Synths/Synths - Synthwave Arp Pluck C3.flac",
+"name": "Synthwave Arp Pluck C3",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "synthwave retro 80s"
+},
+{
 "path": "STRATUM Originals/Synths/Synths - Synthwave Brass C3.flac",
 "name": "Synthwave Brass C3",
 "category": "Synths",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Synths/Synths - Techno Acid Stab C3.flac",
+"name": "Techno Acid Stab C3",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "techno dance"
+},
+{
+"path": "STRATUM Originals/Synths/Synths - Techno Dub Chord C3.flac",
+"name": "Techno Dub Chord C3",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "techno dance ambient"
+},
+{
+"path": "STRATUM Originals/Synths/Synths - Trance Pluck C4.flac",
+"name": "Trance Pluck C4",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "trance edm dance"
 },
 {
 "path": "STRATUM Originals/Synths/Synths - Trance Stab C3.flac",
@@ -4914,10 +5453,136 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Synths/Synths - Trance Supersaw Chord C4.flac",
+"name": "Trance Supersaw Chord C4",
+"category": "Synths",
+"collection": "STRATUM Originals",
+"genres": "trance edm dance"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Afrobeats Highlife Guitar C4.flac",
+"name": "Afrobeats Highlife Guitar C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "afrobeats afro"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Blues Guitar Chord C3.flac",
+"name": "Blues Guitar Chord C3",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "blues rock"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Blues Guitar Note C4.flac",
+"name": "Blues Guitar Note C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "blues rock"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Country Acoustic Strum C4.flac",
+"name": "Country Acoustic Strum C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "country folk"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Country Banjo C4.flac",
+"name": "Country Banjo C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "country folk"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Country Twang Guitar C4.flac",
+"name": "Country Twang Guitar C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "country folk"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Folk Acoustic Strum C4.flac",
+"name": "Folk Acoustic Strum C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "folk acoustic indie"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Funk Guitar Chank C4.flac",
+"name": "Funk Guitar Chank C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "funk soul disco"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Indie Clean Guitar Chord C4.flac",
+"name": "Indie Clean Guitar Chord C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "indie rock pop"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Latin Nylon Guitar C4.flac",
+"name": "Latin Nylon Guitar C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "latin bossa world"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Lo-fi Guitar Chord C4.flac",
+"name": "Lo-fi Guitar Chord C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "lo-fi chill hip hop"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Metal Chord E2.flac",
+"name": "Metal Chord E2",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "metal rock"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Metal Chug E2.flac",
+"name": "Metal Chug E2",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "metal rock"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Punk Power Chord C3.flac",
+"name": "Punk Power Chord C3",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "punk rock"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Reggae Skank Chord C4.flac",
+"name": "Reggae Skank Chord C4",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "reggae dub roots"
+},
+{
+"path": "STRATUM Originals/Guitar/Guitar - Rock Power Chord C3.flac",
+"name": "Rock Power Chord C3",
+"category": "Guitar",
+"collection": "STRATUM Originals",
+"genres": "rock indie punk metal"
+},
+{
 "path": "STRATUM Originals/World/World - Amapiano Log Drum C2.flac",
 "name": "Amapiano Log Drum C2",
 "category": "World",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/World/World - Amapiano Log Drum Deep C2.flac",
+"name": "Amapiano Log Drum Deep C2",
+"category": "World",
+"collection": "STRATUM Originals",
+"genres": "amapiano afro house"
 },
 {
 "path": "STRATUM Originals/World/World - Amapiano Log Drum High C3.flac",
@@ -4926,10 +5591,94 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/World/World - World Frame Drum.flac",
+"name": "World Frame Drum",
+"category": "World",
+"collection": "STRATUM Originals",
+"genres": "world folk afro"
+},
+{
+"path": "STRATUM Originals/World/World - World Kalimba C4.flac",
+"name": "World Kalimba C4",
+"category": "World",
+"collection": "STRATUM Originals",
+"genres": "world folk afro"
+},
+{
+"path": "STRATUM Originals/World/World - World Steel Drum C4.flac",
+"name": "World Steel Drum C4",
+"category": "World",
+"collection": "STRATUM Originals",
+"genres": "world folk afro"
+},
+{
+"path": "STRATUM Originals/World/World - World Udu.flac",
+"name": "World Udu",
+"category": "World",
+"collection": "STRATUM Originals",
+"genres": "world folk afro"
+},
+{
+"path": "STRATUM Originals/Brass/Brass - Funk Horn Stab C4.flac",
+"name": "Funk Horn Stab C4",
+"category": "Brass",
+"collection": "STRATUM Originals",
+"genres": "funk soul disco"
+},
+{
+"path": "STRATUM Originals/Brass/Brass - Salsa Brass Stab C4.flac",
+"name": "Salsa Brass Stab C4",
+"category": "Brass",
+"collection": "STRATUM Originals",
+"genres": "salsa latin"
+},
+{
+"path": "STRATUM Originals/Brass/Brass - Soul Horn Stab C4.flac",
+"name": "Soul Horn Stab C4",
+"category": "Brass",
+"collection": "STRATUM Originals",
+"genres": "soul funk r&b jazz"
+},
+{
 "path": "STRATUM Originals/Bass/Bass - Acid Bass C2.flac",
 "name": "Acid Bass C2",
 "category": "Bass",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Dancehall Bass C2.flac",
+"name": "Dancehall Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "dancehall reggae caribbean"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - DnB Reese C2.flac",
+"name": "DnB Reese C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "dnb drum and bass jungle"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - DnB Sub C1.flac",
+"name": "DnB Sub C1",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "dnb drum and bass jungle"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Dubstep Growl C1.flac",
+"name": "Dubstep Growl C1",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "dubstep edm bass"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Dubstep Wobble C1.flac",
+"name": "Dubstep Wobble C1",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "dubstep edm bass"
 },
 {
 "path": "STRATUM Originals/Bass/Bass - FM Bass C2.flac",
@@ -4938,10 +5687,38 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Bass/Bass - Funk Slap Bass C2.flac",
+"name": "Funk Slap Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "funk soul disco"
+},
+{
 "path": "STRATUM Originals/Bass/Bass - Growl Bass C2.flac",
 "name": "Growl Bass C2",
 "category": "Bass",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Hip hop Bass C2.flac",
+"name": "Hip hop Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "hip hop boom bap"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - House Organ Bass C2.flac",
+"name": "House Organ Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "house dance"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Jazz Upright Bass C2.flac",
+"name": "Jazz Upright Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "jazz swing"
 },
 {
 "path": "STRATUM Originals/Bass/Bass - Pluck Bass C2.flac",
@@ -4950,10 +5727,52 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Bass/Bass - Pop Synth Bass C2.flac",
+"name": "Pop Synth Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "pop dance"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - R&B Sub Bass C2.flac",
+"name": "R&B Sub Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "r&b soul"
+},
+{
 "path": "STRATUM Originals/Bass/Bass - Reese Bass C2.flac",
 "name": "Reese Bass C2",
 "category": "Bass",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Reggae Bass C2.flac",
+"name": "Reggae Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "reggae dub roots"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Rock Pick Bass C2.flac",
+"name": "Rock Pick Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "rock indie"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Salsa Tumbao Bass C2.flac",
+"name": "Salsa Tumbao Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "salsa latin"
+},
+{
+"path": "STRATUM Originals/Bass/Bass - Soul Finger Bass C2.flac",
+"name": "Soul Finger Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "soul funk r&b"
 },
 {
 "path": "STRATUM Originals/Bass/Bass - Sub Sine C2.flac",
@@ -4962,10 +5781,143 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Bass/Bass - Synthwave Bass C2.flac",
+"name": "Synthwave Bass C2",
+"category": "Bass",
+"collection": "STRATUM Originals",
+"genres": "synthwave retro 80s"
+},
+{
 "path": "STRATUM Originals/Bass/Bass - Wobble Bass C2.flac",
 "name": "Wobble Bass C2",
 "category": "Bass",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Mallets and Bells/Mallets and Bells - Ambient Glass Bell C5.flac",
+"name": "Ambient Glass Bell C5",
+"category": "Mallets and Bells",
+"collection": "STRATUM Originals",
+"genres": "ambient chill cinematic"
+},
+{
+"path": "STRATUM Originals/Mallets and Bells/Mallets and Bells - Trap Bell Lead C5.flac",
+"name": "Trap Bell Lead C5",
+"category": "Mallets and Bells",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Afrobeats Conga.flac",
+"name": "Afrobeats Conga",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "afrobeats afro world"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Afrobeats Rim.wav",
+"name": "Afrobeats Rim",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "afrobeats afro"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Afrobeats Shaker.flac",
+"name": "Afrobeats Shaker",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "afrobeats afro"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Amapiano Shaker.wav",
+"name": "Amapiano Shaker",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "amapiano afro house"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Cinematic Taiko.flac",
+"name": "Cinematic Taiko",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "cinematic trailer score world"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Classical Timpani C2.flac",
+"name": "Classical Timpani C2",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "classical orchestral cinematic"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Dancehall Rim.wav",
+"name": "Dancehall Rim",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "dancehall reggae caribbean"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Indie Tambourine.flac",
+"name": "Indie Tambourine",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "indie rock pop"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Latin Clave.flac",
+"name": "Latin Clave",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "latin bossa world salsa"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Latin Conga High.flac",
+"name": "Latin Conga High",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "latin bossa world"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Latin Conga Low.flac",
+"name": "Latin Conga Low",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "latin bossa world"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Latin Guiro.flac",
+"name": "Latin Guiro",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "latin bossa world"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Reggae Cross Stick.wav",
+"name": "Reggae Cross Stick",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "reggae dub roots"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Reggaeton Rim.wav",
+"name": "Reggaeton Rim",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "reggaeton latin dembow"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Salsa Cowbell.flac",
+"name": "Salsa Cowbell",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "salsa latin"
+},
+{
+"path": "STRATUM Originals/Percussion/Percussion - Salsa Timbale.flac",
+"name": "Salsa Timbale",
+"category": "Percussion",
+"collection": "STRATUM Originals",
+"genres": "salsa latin"
 },
 {
 "path": "STRATUM Originals/Pads/Pads - Airy Pad C3.flac",
@@ -4974,10 +5926,52 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Pads/Pads - Ambient Drone C3.flac",
+"name": "Ambient Drone C3",
+"category": "Pads",
+"collection": "STRATUM Originals",
+"genres": "ambient chill cinematic"
+},
+{
+"path": "STRATUM Originals/Pads/Pads - Ambient Shimmer Pad C4.flac",
+"name": "Ambient Shimmer Pad C4",
+"category": "Pads",
+"collection": "STRATUM Originals",
+"genres": "ambient chill cinematic"
+},
+{
 "path": "STRATUM Originals/Pads/Pads - Dark Pad C3.flac",
 "name": "Dark Pad C3",
 "category": "Pads",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Pads/Pads - DnB Liquid Pad C4.flac",
+"name": "DnB Liquid Pad C4",
+"category": "Pads",
+"collection": "STRATUM Originals",
+"genres": "dnb drum and bass jungle ambient"
+},
+{
+"path": "STRATUM Originals/Pads/Pads - R&B Silk Pad C4.flac",
+"name": "R&B Silk Pad C4",
+"category": "Pads",
+"collection": "STRATUM Originals",
+"genres": "r&b soul ambient"
+},
+{
+"path": "STRATUM Originals/Pads/Pads - Synthwave Pad C4.flac",
+"name": "Synthwave Pad C4",
+"category": "Pads",
+"collection": "STRATUM Originals",
+"genres": "synthwave retro 80s"
+},
+{
+"path": "STRATUM Originals/Pads/Pads - Trance Pad C4.flac",
+"name": "Trance Pad C4",
+"category": "Pads",
+"collection": "STRATUM Originals",
+"genres": "trance edm dance ambient"
 },
 {
 "path": "STRATUM Originals/Pads/Pads - Vapor Pad C3.flac",
@@ -4992,10 +5986,52 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Saxophone/Saxophone - Jazz Sax C4.flac",
+"name": "Jazz Sax C4",
+"category": "Saxophone",
+"collection": "STRATUM Originals",
+"genres": "jazz swing soul"
+},
+{
+"path": "STRATUM Originals/Toms/Toms - Rock Floor Tom C2.flac",
+"name": "Rock Floor Tom C2",
+"category": "Toms",
+"collection": "STRATUM Originals",
+"genres": "rock indie"
+},
+{
+"path": "STRATUM Originals/Toms/Toms - Synthwave Tom C3.flac",
+"name": "Synthwave Tom C3",
+"category": "Toms",
+"collection": "STRATUM Originals",
+"genres": "synthwave retro 80s"
+},
+{
+"path": "STRATUM Originals/Claps/Claps - Amapiano Clap.flac",
+"name": "Amapiano Clap",
+"category": "Claps",
+"collection": "STRATUM Originals",
+"genres": "amapiano afro house"
+},
+{
 "path": "STRATUM Originals/Claps/Claps - Electronic Clap.flac",
 "name": "Electronic Clap",
 "category": "Claps",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Claps/Claps - Folk Hand Clap.flac",
+"name": "Folk Hand Clap",
+"category": "Claps",
+"collection": "STRATUM Originals",
+"genres": "folk acoustic indie"
+},
+{
+"path": "STRATUM Originals/Claps/Claps - Gospel Clap Stack.flac",
+"name": "Gospel Clap Stack",
+"category": "Claps",
+"collection": "STRATUM Originals",
+"genres": "gospel soul"
 },
 {
 "path": "STRATUM Originals/Claps/Claps - Gospel Snap Clap.flac",
@@ -5004,10 +6040,31 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Claps/Claps - House Clap Wide.flac",
+"name": "House Clap Wide",
+"category": "Claps",
+"collection": "STRATUM Originals",
+"genres": "house dance"
+},
+{
 "path": "STRATUM Originals/Claps/Claps - House Clap.flac",
 "name": "House Clap",
 "category": "Claps",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Claps/Claps - Pop Clap.flac",
+"name": "Pop Clap",
+"category": "Claps",
+"collection": "STRATUM Originals",
+"genres": "pop dance"
+},
+{
+"path": "STRATUM Originals/Claps/Claps - Trap Clap Layer.flac",
+"name": "Trap Clap Layer",
+"category": "Claps",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
 },
 {
 "path": "STRATUM Originals/Claps/Claps - Trap Clap.flac",
@@ -5016,10 +6073,59 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Woodwinds/Woodwinds - Blues Harmonica C4.flac",
+"name": "Blues Harmonica C4",
+"category": "Woodwinds",
+"collection": "STRATUM Originals",
+"genres": "blues rock country folk"
+},
+{
+"path": "STRATUM Originals/Woodwinds/Woodwinds - Classical Flute C5.flac",
+"name": "Classical Flute C5",
+"category": "Woodwinds",
+"collection": "STRATUM Originals",
+"genres": "classical orchestral cinematic"
+},
+{
+"path": "STRATUM Originals/Woodwinds/Woodwinds - Trap Flute C5.flac",
+"name": "Trap Flute C5",
+"category": "Woodwinds",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
+},
+{
+"path": "STRATUM Originals/Woodwinds/Woodwinds - World Pan Flute C5.flac",
+"name": "World Pan Flute C5",
+"category": "Woodwinds",
+"collection": "STRATUM Originals",
+"genres": "world folk afro"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Country Brush Snare.flac",
+"name": "Country Brush Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "country folk"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - DnB Snare Snappy.flac",
+"name": "DnB Snare Snappy",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "dnb drum and bass jungle"
+},
+{
 "path": "STRATUM Originals/Snares/Snares - DnB Snare.flac",
 "name": "DnB Snare",
 "category": "Snares",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Drill Snare Tight.flac",
+"name": "Drill Snare Tight",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "drill uk drill trap"
 },
 {
 "path": "STRATUM Originals/Snares/Snares - Drill Snare.flac",
@@ -5028,16 +6134,107 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Snares/Snares - Dubstep Snare Big.flac",
+"name": "Dubstep Snare Big",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "dubstep edm bass"
+},
+{
 "path": "STRATUM Originals/Snares/Snares - Electronic Snare.flac",
 "name": "Electronic Snare",
 "category": "Snares",
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Snares/Snares - Funk Snare Tight.flac",
+"name": "Funk Snare Tight",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "funk soul disco"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Hip hop Snare.flac",
+"name": "Hip hop Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "hip hop boom bap"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Jazz Brush Snare.flac",
+"name": "Jazz Brush Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "jazz swing"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Lo-fi Snare.flac",
+"name": "Lo-fi Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "lo-fi chill hip hop"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Pop Snare.flac",
+"name": "Pop Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "pop dance"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Punk Snare.flac",
+"name": "Punk Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "punk rock"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - R&B Finger Snap.flac",
+"name": "R&B Finger Snap",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "r&b soul"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Reggaeton Snare.flac",
+"name": "Reggaeton Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "reggaeton latin dembow"
+},
+{
 "path": "STRATUM Originals/Snares/Snares - Rim Tick.wav",
 "name": "Rim Tick",
 "category": "Snares",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Rock Snare.flac",
+"name": "Rock Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "rock indie"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Soul Snare.flac",
+"name": "Soul Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "soul funk r&b"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Synthwave Gated Snare.flac",
+"name": "Synthwave Gated Snare",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "synthwave retro 80s"
+},
+{
+"path": "STRATUM Originals/Snares/Snares - Trap Snare Crack.flac",
+"name": "Trap Snare Crack",
+"category": "Snares",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
 },
 {
 "path": "STRATUM Originals/Snares/Snares - Trap Snare.flac",
@@ -5106,10 +6303,38 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/808s/808s - Drill 808 Slide C2.flac",
+"name": "Drill 808 Slide C2",
+"category": "808s",
+"collection": "STRATUM Originals",
+"genres": "drill uk drill trap"
+},
+{
+"path": "STRATUM Originals/808s/808s - Trap 808 Long C2.flac",
+"name": "Trap 808 Long C2",
+"category": "808s",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
+},
+{
 "path": "STRATUM Originals/Kicks/Kicks - Afro Kick.flac",
 "name": "Afro Kick",
 "category": "Kicks",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Afrobeats Kick.flac",
+"name": "Afrobeats Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "afrobeats afro"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Amapiano Kick.flac",
+"name": "Amapiano Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "amapiano afro house"
 },
 {
 "path": "STRATUM Originals/Kicks/Kicks - Boom Bap Kick.flac",
@@ -5118,10 +6343,52 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Kicks/Kicks - Dancehall Kick.flac",
+"name": "Dancehall Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "dancehall reggae caribbean"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - DnB Kick Tight.flac",
+"name": "DnB Kick Tight",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "dnb drum and bass jungle"
+},
+{
 "path": "STRATUM Originals/Kicks/Kicks - DnB Kick.flac",
 "name": "DnB Kick",
 "category": "Kicks",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Drill Kick.flac",
+"name": "Drill Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "drill uk drill trap"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Dubstep Kick.flac",
+"name": "Dubstep Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "dubstep edm bass"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Folk Stomp.flac",
+"name": "Folk Stomp",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "folk acoustic indie"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Gospel Kick.flac",
+"name": "Gospel Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "gospel soul"
 },
 {
 "path": "STRATUM Originals/Kicks/Kicks - Hardstyle Kick.flac",
@@ -5130,10 +6397,73 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Kicks/Kicks - Hip hop Kick.flac",
+"name": "Hip hop Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "hip hop boom bap"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - House Kick Deep.flac",
+"name": "House Kick Deep",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "house dance"
+},
+{
 "path": "STRATUM Originals/Kicks/Kicks - House Kick.flac",
 "name": "House Kick",
 "category": "Kicks",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Lo-fi Kick.flac",
+"name": "Lo-fi Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "lo-fi chill hip hop"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Metal Kick Click.flac",
+"name": "Metal Kick Click",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "metal rock"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Pop Kick.flac",
+"name": "Pop Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "pop dance"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - R&B Kick Soft.flac",
+"name": "R&B Kick Soft",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "r&b soul"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Reggae Kick.flac",
+"name": "Reggae Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "reggae dub roots"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Reggaeton Kick.flac",
+"name": "Reggaeton Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "reggaeton latin dembow"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Rock Kick.flac",
+"name": "Rock Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "rock indie"
 },
 {
 "path": "STRATUM Originals/Kicks/Kicks - Soft Lo-fi Kick.flac",
@@ -5142,16 +6472,58 @@
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Kicks/Kicks - Soul Kick.flac",
+"name": "Soul Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "soul funk r&b"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Synthwave Kick.flac",
+"name": "Synthwave Kick",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "synthwave retro 80s"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Techno Kick Hard.flac",
+"name": "Techno Kick Hard",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "techno dance"
+},
+{
 "path": "STRATUM Originals/Kicks/Kicks - Techno Kick.flac",
 "name": "Techno Kick",
 "category": "Kicks",
 "collection": "STRATUM Originals"
 },
 {
+"path": "STRATUM Originals/Kicks/Kicks - Techno Rumble.flac",
+"name": "Techno Rumble",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "techno dance"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Trance Kick Punchy.flac",
+"name": "Trance Kick Punchy",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "trance edm dance"
+},
+{
 "path": "STRATUM Originals/Kicks/Kicks - Trance Kick.flac",
 "name": "Trance Kick",
 "category": "Kicks",
 "collection": "STRATUM Originals"
+},
+{
+"path": "STRATUM Originals/Kicks/Kicks - Trap Kick Hard.flac",
+"name": "Trap Kick Hard",
+"category": "Kicks",
+"collection": "STRATUM Originals",
+"genres": "trap hip hop"
 },
 {
 "path": "STRATUM Originals/Kicks/Kicks - Trap Kick.flac",

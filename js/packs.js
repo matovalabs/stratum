@@ -20,7 +20,7 @@
     const acc = !m[2] ? 0 : m[2] === 'b' ? -1 : 1;
     return 12 * (parseInt(m[3], 10) + 1) + NOTES[m[1].toLowerCase()] + acc;
   };
-  const tag = (x) => { x.tags = GENRES[x.category] || ''; return x; };
+  const tag = (x) => { x.tags = (GENRES[x.category] || '') + (x.genres ? ' ' + x.genres : ''); return x; };
   let list = null;
   // The bundled sounds and My Sounds, then every pack. Stand-ins for imported projects stay with IO.libList, the bundled sounds.
   IO.soundList = async () => {
